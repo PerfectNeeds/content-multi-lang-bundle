@@ -1,0 +1,62 @@
+<tr class="image-row" id="image-{{ image.id }}" data-id="{{ image.id }}">
+    <td><input type="checkbox" class="multi-deleted" value="{{ image.id }}" name="multi-delete"></td>
+    <td class="no-padding-right" style="width: 45px;">
+        <div class="thumb">
+            <img src="{{ asset(image.assetPath) }}">
+            <div class="caption-overflow">
+                <span>
+                    <a href="{{ asset(image.assetPath) }}" data-popup="lightbox" rel="gallery"
+                       class="btn border-white text-white btn-flat btn-icon btn-rounded"><i class="icon-zoomin3"></i></a>
+                </span>
+            </div>
+        </div>
+    </td>
+    <td class="dimension">{{ image.width }} x {{ image.height }}</td>
+    <td class="size">{{ fileSizeConvert(image.size) }}</td>
+    <td>
+        {% for radioButton in imageSetting.radioButton %}
+            {% set disable ="" %}
+            {% if radioButtonArray is defined %}
+                {% if (image.imageType and image.imageType != radioButton.imageType.id and image.imageType not in radioButtonArray) or (image.imageType and image.imageType not in radioButtonArray and post.imageByType(radioButton.imageType.id) != false ) %}
+                    {% set disable %}disabled=""{% endset %}
+                {% endif %}
+            {% endif %}
+
+            <label>
+                <input type="radio" name="main_{{ radioButton.imageType.id }}" class="set-main-image"
+                       data-type="{{ radioButton.imageType.id }}"
+                       value="{{ image.id }}" {{ disable }} {% if post.imageByType(radioButton.imageType.id) != false and post.imageByType(radioButton.imageType.id).id == image.id %}checked=""{% endif %}>
+                {{ radioButton.imageType.name }}
+            </label>
+            <br>
+        {% endfor %}
+        {% for notRadioButton in imageSetting.notRadioButton %}
+            {% set checked ="" %}
+            {% if post.images([notRadioButton.imageType.id])|length > 0 %}
+                {% for selectedImage in post.images([notRadioButton.imageType.id]) if  image.id == selectedImage.id %}
+                    {% set checked %} checked=""{% endset %}
+                {% endfor %}
+            {% endif %}
+
+            <label>
+                <input type="checkbox" class="set-other-image" data-type="{{ notRadioButton.imageType.id }}" value="{{ image.id }}" {{ checked }}>
+                {{ notRadioButton.imageType.name }}
+            </label>
+        {% endfor %}
+
+    </td>
+    <td>
+        <a href="#" class="input-update-name" data-type="text" data-clear="false" data-ext="{{ image.nameExtension }}" data-inputclass="form-control" data-value="{{ image.nameWithoutExtension }}" data-pk="{{ image.id }}" data-title="Update image name">{{ image.nameWithoutExtension }}</a>
+    </td>
+    <td>
+        <div class="input-group">
+        <input type="text" value="{{ image.alt }}" class="form-control imageAlt" name="data[alt][{{ image.id }}]">
+            <span class="input-group-btn">
+                <button class="btn btn-default update-image-alt" type="button" data-id="{{ image.id }}" data-popup="tooltip"  data-original-title="Update alt"><i class="icon-reload-alt"></i></button>
+            </span>
+        </div>
+    </td>
+    <td class="text-center">
+        <a href="#" class="btn-default delete" data-id="{{ image.id }}"><i class="icon-trash" data-popup="tooltip" title="" data-original-title="Delete"></i></a>
+    </td>
+</tr>

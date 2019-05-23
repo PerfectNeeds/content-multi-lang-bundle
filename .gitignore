@@ -1,0 +1,8 @@
+# PHPStorem folder
+/.idea/*
+
+# Mac OS Files
+/.DS_Store
+
+# netbeans folder
+/nbproject

@@ -1,0 +1,63 @@
+<div class="panel panel-flat">
+    <div class="panel-body">
+        <div class="mb-10">
+            <h4 class="no-margin-top mb-10">Images Dimensions:</h4>
+            {% for imageSettingType in imageSetting.imageSettingTypes %}
+                <p class="mb-5 ml-5"><strong>{{ imageSettingType.imageType.name }}
+                        :</strong>
+                        {% if imageSettingType.width == null and imageSettingType.height == null %}
+                        --
+                    {% elseif imageSettingType.width != null  and imageSettingType.height == null %}
+                        {{ imageSettingType.width }}px * --
+                    {% elseif imageSettingType.height != null and  imageSettingType.width == null %}
+                        -- * {{ imageSettingType.height }}px
+                    {% else %}
+                        {{ imageSettingType.width }}px * {{ imageSettingType.height }}px
+                    {% endif %}
+                </p>
+            {% endfor %}
+        </div>
+        <div class="file-loading">
+            <input id="input-ficons-2" name="files[]" multiple type="file">
+
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-white">
+    <div class="panel-heading">
+        <h6 class="panel-title">{{ imageSetting.entityName }} Images</h6>
+        <div class="heading-elements">
+            <div class="heading-btn">
+                <button type="button" class="btn btn-danger delete" disabled="" id="delete">Delete</button> 
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table sorted_table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"/> </th>
+                    <th>Image</th>
+                    <th>Dimensions</th>
+                    <th>Size</th>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Alt</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+            <tbody id="image-list">
+
+                {% for image in entity.images|reverse %}
+                    {% set radioButtonArray = [] %}
+                    {% for radioButton in imageSetting.notRadioButton %}
+                        {% set radioButtonArray = radioButtonArray|merge([radioButton.imageType.id]) %}
+                    {% endfor %}
+                    {% include 'cms/admin/post/imageItem.html.twig' with {'image':image} %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
