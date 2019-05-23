@@ -4,11 +4,10 @@ namespace PN\ContentBundle\Entity\Translation;
 
 use Doctrine\ORM\Mapping as ORM;
 use VM5\EntityTranslationsBundle\Model\EditableTranslation;
-use PN\Bundle\LocaleBundle\Model\TranslationEntity;
+use PN\LocaleBundle\Model\TranslationEntity;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="post_translations")
+ * @ORM\MappedSuperclass
  */
 class PostTranslation extends TranslationEntity implements EditableTranslation {
 
@@ -23,7 +22,7 @@ class PostTranslation extends TranslationEntity implements EditableTranslation {
     ];
 
     /**
-     * @var 
+     * @var
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="PN\ContentBundle\Entity\Post", inversedBy="translations")
      */
@@ -32,7 +31,7 @@ class PostTranslation extends TranslationEntity implements EditableTranslation {
     /**
      * @var Language
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="PN\Bundle\LocaleBundle\Entity\Language")
+     * @ORM\ManyToOne(targetEntity="PN\LocaleBundle\Entity\Language")
      */
     protected $language;
 

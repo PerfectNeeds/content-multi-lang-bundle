@@ -8,10 +8,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use PN\MediaBundle\Entity\Image;
 use PN\ContentBundle\Entity\Post;
-use PN\Bundle\ServiceBundle\Service\CommonFunctionService;
+use PN\ServiceBundle\Service\CommonFunctionService;
 use PN\ServiceBundle\Service\ContainerParameterService;
-use PN\Bundle\ServiceBundle\Utils\Validate;
-use PN\Bundle\ServiceBundle\Utils\Slug;
+use PN\ServiceBundle\Utils\Validate;
+use PN\ServiceBundle\Utils\Slug;
 
 /**
  * Post controller.

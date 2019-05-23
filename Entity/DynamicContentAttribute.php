@@ -5,7 +5,7 @@ namespace PN\ContentBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use VM5\EntityTranslationsBundle\Model\Translatable;
-use PN\Bundle\LocaleBundle\Model\LocaleTrait;
+use PN\LocaleBundle\Model\LocaleTrait;
 
 /**
  * @ORM\Table(name="dynamic_content_attribute")

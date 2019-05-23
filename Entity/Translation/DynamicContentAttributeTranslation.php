@@ -4,7 +4,7 @@ namespace PN\ContentBundle\Entity\Translation;
 
 use Doctrine\ORM\Mapping as ORM;
 use VM5\EntityTranslationsBundle\Model\EditableTranslation;
-use PN\Bundle\LocaleBundle\Model\TranslationEntity;
+use PN\LocaleBundle\Model\TranslationEntity;
 
 /**
  * @ORM\Entity
@@ -28,7 +28,7 @@ class DynamicContentAttributeTranslation extends TranslationEntity implements Ed
     /**
      * @var Language
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="PN\Bundle\LocaleBundle\Entity\Language")
+     * @ORM\ManyToOne(targetEntity="PN\LocaleBundle\Entity\Language")
      */
     protected $language;
 

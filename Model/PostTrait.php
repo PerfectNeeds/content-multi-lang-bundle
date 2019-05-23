@@ -15,11 +15,6 @@ trait PostTrait {
      */
     private $id;
 
-    /**
-     * @ORM\OneToMany(targetEntity="PN\ContentBundle\Entity\Translation\PostTranslation", mappedBy="translatable", cascade={"ALL"}, orphanRemoval=true)
-     */
-    protected $translations;
-
     public function getId() {
         return $this->id;
     }
