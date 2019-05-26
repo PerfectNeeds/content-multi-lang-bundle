@@ -1,0 +1,4 @@
+content_admin:
+    resource: "@PNContentBundle/Controller/Administration"
+    type:     annotation
+    prefix:   /admin/content

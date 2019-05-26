@@ -22,24 +22,31 @@ use PN\ServiceBundle\Utils\Slug;
 class PostController extends Controller {
 
     protected $imageClass = null;
+    protected $postClass = null;
 
     public function __construct(ContainerInterface $container) {
         $this->imageClass = $container->get(ContainerParameterService::class)->get('pn_media_image.image_class');
+        $this->postClass = $container->get(ContainerParameterService::class)->get('pn_content_post_class');
     }
 
     /**
      * @Route("/gallery/{id}", name="post_set_images", methods={"GET"})
      */
-    public function imagesAction(Post $post) {
+    public function imagesAction($id) {
         $this->denyAccessUnlessGranted('ROLE_IMAGE_GALLERY');
 
         $em = $this->getDoctrine()->getManager();
+        $post = $em->getRepository($this->postClass)->find($id);
+        if (!$post) {
+            throw $this->createNotFoundException();
+        }
+
 
         $entity = $post->getRelationalEntity();
         $entityName = $this->get(CommonFunctionService::class)->getClassNameByObject($entity);
         $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
 
-        return $this->render('@PNContent:Administration/Post:images.html.twig', [
+        return $this->render('@PNContent/Administration/Post/images.html.twig', [
                     'post' => $post,
                     'imageSetting' => $imageSetting,
                     'entity' => $entity,
@@ -51,20 +58,26 @@ class PostController extends Controller {
      *
      * @Route("/gallery/{id}" , name="post_create_images", methods={"POST"})
      */
-    public function uploadImageAction(Request $request, Post $post) {
+    public function uploadImageAction(Request $request, $id) {
         $this->denyAccessUnlessGranted('ROLE_IMAGE_GALLERY');
 
         $em = $this->getDoctrine()->getManager();
+
+        $post = $em->getRepository($this->postClass)->find($id);
+        if (!$post) {
+            $return = ['error' => 0, "message" => 'Error'];
+            return new JsonResponse($return);
+        }
 
         $entity = $post->getRelationalEntity();
         $entityName = $this->get(CommonFunctionService::class)->getClassNameByObject($entity);
         $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
 
-        $imageUploader = $this->get('upload_image');
+        $imageUploader = $this->get('pn_media_upload_image');
         $files = $request->files->get('files');
         foreach ($files as $file) {
             $image = $imageUploader->uploadSingleImage($post, $file, $imageSetting->getId(), $request, Image::TYPE_TEMP);
-            $returnData [] = $this->renderView('@PNContent:Administration/Post:imageItem.html.twig', [
+            $returnData [] = $this->renderView('@PNContent/Administration/Post/imageItem.html.twig', [
                 'image' => $image,
                 'post' => $post,
                 'imageSetting' => $imageSetting,
@@ -78,10 +91,17 @@ class PostController extends Controller {
      *
      * @Route("/delete-image/{post}", name="post_images_delete", methods={"POST"})
      */
-    public function deleteImageAction(Request $request, Post $post) {
+    public function deleteImageAction(Request $request, $post) {
         $this->denyAccessUnlessGranted('ROLE_IMAGE_GALLERY');
 
         $em = $this->getDoctrine()->getManager();
+
+        $post = $em->getRepository($this->postClass)->find($post);
+        if (!$post) {
+            $return = ['error' => 0, "message" => 'Error'];
+            return new JsonResponse($return);
+        }
+
         $imageId = $request->request->get('id');
         $image = $em->getRepository($this->imageClass)->find($imageId);
         if (!$image) {
@@ -102,10 +122,17 @@ class PostController extends Controller {
      *
      * @Route("/delete-multi-image/{post}", name="post_images_multi_delete", methods={"POST"})
      */
-    public function deleteMultiImageAction(Request $request, Post $post) {
+    public function deleteMultiImageAction(Request $request, $post) {
         $this->denyAccessUnlessGranted('ROLE_IMAGE_GALLERY');
 
         $em = $this->getDoctrine()->getManager();
+
+        $post = $em->getRepository($this->postClass)->find($post);
+        if (!$post) {
+            $return = ['error' => 0, "message" => 'Error'];
+            return new JsonResponse($return);
+        }
+
 
         $imageIds = $request->request->get('ids');
         if (!$post) {
@@ -135,15 +162,23 @@ class PostController extends Controller {
      *
      * @Route("/gallery/type/ajax/{post}", name = "post_set_image_type_ajax", methods={"POST"})
      */
-    public function setImageTypeAction(Request $request, Post $post) {
+    public function setImageTypeAction(Request $request, $post) {
         $this->denyAccessUnlessGranted('ROLE_IMAGE_GALLERY');
+
+        $em = $this->getDoctrine()->getManager();
+
+        $post = $em->getRepository($this->postClass)->find($post);
+        if (!$post) {
+            $return = ['error' => 0, "message" => 'Error'];
+            return new JsonResponse($return);
+        }
+
 
         $imageType = Image::TYPE_MAIN;
         $type = $request->request->get('type');
         if (isset($type) AND $type != NULL) {
             $imageType = $type;
         }
-        $em = $this->getDoctrine()->getManager();
 
         $entity = $post->getRelationalEntity();
         $entityName = $this->get(CommonFunctionService::class)->getClassNameByObject($entity);
@@ -155,7 +190,7 @@ class PostController extends Controller {
             return new JsonResponse(['error' => 1, 'message' => 'Please enter image name']);
         }
 
-        $imageUploader = $this->get('upload_image');
+        $imageUploader = $this->get('pn_media_upload_image');
         if ($imageSetting->getAutoResize() == TRUE) {
 
             // resize the image
@@ -163,7 +198,7 @@ class PostController extends Controller {
         }
         $mainImage = $em->getRepository($this->imageClass)->setMainImage('PNContentBundle:Post', $post->getId(), $image, $imageType);
 
-        $returnData [] = $this->renderView('@PNContent:Administration/Post:imageItem.html.twig', [
+        $returnData [] = $this->renderView('@PNContent/Administration/Post/imageItem.html.twig', [
             'image' => $mainImage,
             'post' => $post,
             'imageSetting' => $imageSetting,
@@ -177,12 +212,15 @@ class PostController extends Controller {
      *
      * @Route("/sort/{post}", name="image_sort", methods={"POST"})
      */
-    public function sortAction(Request $request, Post $post) {
+    public function sortAction(Request $request, $post) {
+        $em = $this->getDoctrine()->getManager();
+
+        $post = $em->getRepository($this->postClass)->find($post);
         if (!$post) {
             $return = ['error' => 0, "message" => 'Error'];
             return new JsonResponse($return);
         }
-        $em = $this->getDoctrine()->getManager();
+
         $listJson = $request->request->get('json');
         $sortedList = json_decode($listJson);
         $i = 1;
@@ -199,7 +237,7 @@ class PostController extends Controller {
                     continue;
                 }
                 $image = $em->getRepository($this->imageClass)->find($valueNod->id);
-                if ($image->getFirstPost()->getId() != $post->getId()) {
+                if ($image->getPosts()->first()->getId() != $post->getId()) {
                     continue;
                 }
                 $image->setTarteb($i);
