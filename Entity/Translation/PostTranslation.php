@@ -22,13 +22,6 @@ class PostTranslation extends TranslationEntity implements EditableTranslation {
     ];
 
     /**
-     * @var
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="PN\ContentBundle\Entity\Post", inversedBy="translations")
-     */
-    protected $translatable;
-
-    /**
      * @var Language
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="PN\LocaleBundle\Entity\Language")

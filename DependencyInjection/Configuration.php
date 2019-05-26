@@ -17,11 +17,19 @@ class Configuration implements ConfigurationInterface {
      */
     public function getConfigTreeBuilder() {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('cms');
+        $rootNode = $treeBuilder->root('pn_content');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode
+                ->children()
+                ->scalarNode('post_class')
+                ->isRequired()
+                ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('post_translation_class')
+                ->isRequired()
+                ->cannotBeEmpty()
+                ->end()
+        ;
 
         return $treeBuilder;
     }

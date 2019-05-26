@@ -5,6 +5,7 @@ namespace PN\ContentBundle\Controller\Administration;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use PN\MediaBundle\Entity\Image;
 use PN\ContentBundle\Entity\Post;

@@ -9,7 +9,6 @@ services:
         public: false
     
     PN\ContentBundle\Controller\:
-        public: false
         resource: '../../Controller/*'
         
     PN\ContentBundle\Form\:

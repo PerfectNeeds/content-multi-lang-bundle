@@ -12,7 +12,9 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * @link http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class CMSExtension extends Extension {
+class PNContentExtension extends Extension {
+
+    private $alias = "pn_content";
 
     /**
      * {@inheritdoc}
@@ -21,8 +23,15 @@ class CMSExtension extends Extension {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $this->convertConfigToParameter($container, $config);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+    }
+
+    private function convertConfigToParameter(ContainerBuilder $container, $config) {
+        $container->setParameter($this->alias . '_post_class', $config['post_class']);
+        $container->setParameter($this->alias . '_post_translation_class', $config['post_translation_class']);
     }
 
 }

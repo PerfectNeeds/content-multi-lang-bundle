@@ -3,8 +3,11 @@
 namespace PN\ContentBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
+use PN\LocaleBundle\Model\LocaleTrait;
 
 trait PostTrait {
+
+    use LocaleTrait;
 
     /**
      * @var int

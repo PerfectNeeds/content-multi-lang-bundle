@@ -3,15 +3,11 @@
 namespace PN\ContentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use VM5\EntityTranslationsBundle\Model\Translatable;
-use PN\LocaleBundle\Model\LocaleTrait;
 
 /**
  * @ORM\MappedSuperclass
  */
-class Post implements Translatable {
-
-    use LocaleTrait;
+class Post {
 
     /**
      * @ORM\Column(name="content", type="json_array")

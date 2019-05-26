@@ -7,10 +7,17 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use PN\ContentBundle\Form\Model\PostTypeModel;
 use VM5\EntityTranslationsBundle\Form\Type\TranslationsType;
 
 class PostType extends AbstractType {
+
+    protected $postClass;
+
+    public function __construct(ContainerInterface $container) {
+        $this->postClass = $container->getParameter("pn_content_post_class");
+    }
 
     /**
      * {@inheritdoc}
@@ -25,6 +32,7 @@ class PostType extends AbstractType {
                 return $repo->createQueryBuilder('languages');
             }, // optional.
             "label" => false,
+            "entry_options" => ["attributes" => $attributes],
             'entry_language_options' => [
                 'en' => [
                     'required' => true,
@@ -72,7 +80,7 @@ class PostType extends AbstractType {
      */
     public function configureOptions(OptionsResolver $resolver) {
         $resolver->setDefaults(array(
-            'data_class' => 'PN\ContentBundle\Entity\Post',
+            'data_class' => $this->postClass,
             "label" => false,
             "attributes" => null,
         ));
