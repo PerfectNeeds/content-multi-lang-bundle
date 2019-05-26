@@ -1,0 +1,56 @@
+{% extends 'adminTemplate/base.html.twig' %}
+{% set page_title %}Dynamic Content{% endset %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock stylesheets %}
+{% block breadcrumb %}
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>Dashboard</a></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+{% endblock %}
+{% block body %}
+    <ul class="fab-menu fab-menu-fixed fab-menu-bottom-right">
+        <li>
+            <a href="{{ path('dynamic_content_new') }}"
+               class="fab-menu-btn btn bg-blue btn-float btn-rounded btn-icon">
+                <i class="fab-icon-open icon-plus3"></i>
+                <i class="fab-icon-close icon-cross2"></i>
+            </a>
+        </li>
+    </ul>
+    <!-- Ajax sourced data -->
+    <div class="panel panel-flat">
+        <div class="panel-body">
+            <table class="table datatable-ajax table-striped datatable-responsive">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+    <!-- /ajax sourced data -->
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/tables/datatables/datatables.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/selects/select2.min.js') }}"></script>
+    {{ include('adminTemplate/datatable.html.twig', {'path':path('dynamic_content_datatable')}) }}
+    <script type="text/javascript" src="{{ asset('admin/js/pages/components_thumbnails.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/styling/uniform.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/media/fancybox.min.js') }}"></script>
+
+{% endblock javascripts %}

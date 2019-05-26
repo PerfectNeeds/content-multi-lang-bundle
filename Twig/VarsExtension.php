@@ -5,7 +5,7 @@ namespace PN\ContentBundle\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
-use PN\ServiceBundle\Twig\VarsRuntime;
+use PN\ContentBundle\Twig\VarsRuntime;
 
 /**
  * @author Peter Nassef <peter.nassef@gmail.com>

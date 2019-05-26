@@ -1,0 +1,120 @@
+{% extends 'adminTemplate/base.html.twig' %}
+
+{% import 'adminTemplate/macros.html.twig' as macros %}
+{% set page_title %}Dynamic Content{% endset %}
+{% block breadcrumb %}
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>Dashboard</a></li>
+            <li><a href="{{ path('dynamic_content_index') }}">{{ page_title }}</a></li>
+            <li class="active">Edit {{ dynamicContent.title }}</li>
+        </ul>
+    </div>
+{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-3">
+            {{ form_start(edit_form, {'attr':{"data-toggle":"validator",'novalidate':'novalidate'}}) }}
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h5 class="panel-title">Edit {{ dynamicContent.title }}</h5>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        {{ macros.input(edit_form.title,12) }}
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    {% include 'adminTemplate/saveAndResetFormFooter.html.twig' %}
+                </div>
+            </div>
+            {{ form_end(edit_form) }}
+        </div>
+        <div class="col-md-9">
+            {{ form_start(attr_form, {'attr': {"data-toggle":"validator",'novalidate':'novalidate'}}) }}
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h5 class="panel-title">Add new Attribute</h5>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        {{ macros.input(attr_form.title, 4) }}
+                        {{ macros.input(attr_form.hint, 4) }}
+                        {{ macros.input(attr_form.type, 4, null,null, 'form-control select-search') }}
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    {% include 'adminTemplate/saveAndResetFormFooter.html.twig' %}
+                </div>
+            </div>
+            {{ form_end(attr_form) }}
+        </div>
+    </div>
+    {% set laguages = pnLanguages() %}
+    {% if dynamicContent.dynamicContentAttributes.count > 0 %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-flat">
+                    <div class="panel-heading">
+                        <h5 class="panel-title">{{ dynamicContent.title }}'s attributes</h5>
+                    </div>
+                    {{ form_start(eav_form, {'attr':{"data-toggle":"validator",'novalidate':'novalidate'}}) }}
+                    <div class="panel-body">
+                        <div class="row">
+                            {% for attribute in dynamicContentAttributes %}
+                                {% if attribute.type == constant('PN\\ContentBundle\\Entity\\DynamicContentAttribute::TYPE_IMAGE')  %}
+                                    {{ macros.input(attribute(eav_form, attribute.id), 10,attribute.hint,null) }}
+                                    {% if attribute.image != false %}
+                                        <div class="col-xs-2 text-left">
+                                            <div class="thumb" >
+                                                <a href="{{ asset(attribute.image.assetPath) }}" data-popup="lightbox">
+                                                    <img src="{{ asset(attribute.image.assetPath) }}" alt="" style="height: 58px;object-fit: cover">
+                                                    <span class="zoom-image"><i class="icon-plus2"></i></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% elseif attribute.type == constant('PN\\ContentBundle\\Entity\\DynamicContentAttribute::TYPE_DOCUMENT')  %}
+                                    {{ macros.input(attribute(eav_form, attribute.id), 10,attribute.hint,null) }}
+
+                                    {% if attribute.document != false %}
+                                        {% if attribute.document != false %}
+                                            <div class="col-xs-2">
+                                                <div class="form-group mt-5">
+                                                    <a href='{{ path('download', {'d': '{"document":'~ attribute.document.id ~'}'}) }}'  class="btn btn-info mt-20" title="{{ attribute.document.name }}">
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    {{ macros.input(attribute(eav_form, attribute.id), 6,attribute.hint,null) }}
+                                    {% for laguage in laguages %}
+                                        {{ macros.input(attribute(eav_form, attribute.id~"_"~laguage.locale), 6,attribute.hint,null) }}
+                                    {% endfor %}
+                                {% endif %}
+
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        {% include 'adminTemplate/saveAndResetFormFooter.html.twig' %}
+                    </div>
+                    {{ form_end(eav_form) }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {{ getDCA(1)}}
+    
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/selects/select2.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/pages/form_select2.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/validation/validate.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/pages/form_validation.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/media/fancybox.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/styling/uniform.min.js') }}"></script>
+{% endblock javascripts %}

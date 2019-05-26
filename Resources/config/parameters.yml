@@ -1,0 +1,8 @@
+parameters:
+    pn_content_image:
+        upload_paths:
+            - { id: 80, path: 'dynamic-content' }
+    
+    pn_content_document:
+        upload_paths:
+            - { id: 80, path: 'dynamic-content' }

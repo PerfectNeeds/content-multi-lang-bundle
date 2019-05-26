@@ -29,7 +29,7 @@ class DynamicContentAttributeBundleType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $data = $options["data"];
 
-        $languages = $this->em->getRepository('LocaleBundle:Language')->findAll();
+        $languages = $this->em->getRepository('PNLocaleBundle:Language')->findAll();
         foreach ($data as $attribute) {
             $lable = "" . $attribute->getTitle() . " #" . $attribute->getId();
             $attr = ["placeholder" => $attribute->getTypeName()];
@@ -50,6 +50,11 @@ class DynamicContentAttributeBundleType extends AbstractType {
                 case DynamicContentAttribute::TYPE_IMAGE:
                     $inputType = FileType::class;
                     $attr["accept"] = "image/*";
+                    $attr["class"] = "file-styled";
+                    break;
+                case DynamicContentAttribute::TYPE_DOCUMENT:
+                    $inputType = FileType::class;
+                    $attr["class"] = "file-styled";
                     break;
                 default :
                     $inputType = null;
@@ -57,7 +62,7 @@ class DynamicContentAttributeBundleType extends AbstractType {
             }
             if ($inputType !== null) {
                 $builder->add($attribute->getId(), $inputType, ["label" => $lable, "constraints" => $constraints, 'data' => $inputValue, "required" => false, "attr" => $attr, "data_class" => null]);
-                if ($attribute->getType() != DynamicContentAttribute::TYPE_IMAGE) {
+                if (!in_array($attribute->getType(), [DynamicContentAttribute::TYPE_IMAGE, DynamicContentAttribute::TYPE_DOCUMENT])) {
                     foreach ($languages as $language) {
                         $translation = $this->container->get('vm5_entity_translations.translator')->getTranslation($attribute, $language->getLocale());
                         $translatedValue = null;

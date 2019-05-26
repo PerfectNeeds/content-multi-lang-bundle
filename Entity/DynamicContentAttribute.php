@@ -19,12 +19,14 @@ class DynamicContentAttribute implements Translatable {
     CONST TYPE_LONGTEXT = 2;
     CONST TYPE_LINK = 3;
     CONST TYPE_IMAGE = 4;
+    CONST TYPE_DOCUMENT = 5;
 
     public static $types = [
         "Text (100 character)" => self::TYPE_TEXT,
         "Long text" => self::TYPE_LONGTEXT,
         "Link" => self::TYPE_LINK,
         "Image" => self::TYPE_IMAGE,
+        "Document" => self::TYPE_DOCUMENT,
     ];
 
     /**
@@ -45,6 +47,11 @@ class DynamicContentAttribute implements Translatable {
      * @ORM\ManyToMany(targetEntity="\PN\MediaBundle\Entity\Image", cascade={"persist", "remove" })
      */
     protected $image;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="\PN\MediaBundle\Entity\Document" ,cascade={"persist", "remove"})
+     */
+    protected $document;
 
     /**
      * @var string
@@ -219,6 +226,37 @@ class DynamicContentAttribute implements Translatable {
      */
     public function getImage() {
         return $this->image->first();
+    }
+
+    /**
+     * Add document
+     *
+     * @param \PN\MediaBundle\Entity\Document $document
+     *
+     * @return DynamicContentAttribute
+     */
+    public function addDocument(\PN\MediaBundle\Entity\Document $document) {
+        $this->document[] = $document;
+
+        return $this;
+    }
+
+    /**
+     * Remove document
+     *
+     * @param \PN\MediaBundle\Entity\Document $document
+     */
+    public function removeDocument(\PN\MediaBundle\Entity\Document $document) {
+        $this->document->removeElement($document);
+    }
+
+    /**
+     * Get document
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getDocument() {
+        return $this->document->first();
     }
 
     /**

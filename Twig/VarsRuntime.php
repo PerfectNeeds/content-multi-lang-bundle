@@ -5,6 +5,7 @@ namespace PN\ContentBundle\Twig;
 use Twig\Extension\RuntimeExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use PN\ContentBundle\Entity\DynamicContentAttribute;
+use \Symfony\Component\Asset\Packages;
 
 /**
  * @author Peter Nassef <peter.nassef@gmail.com>
@@ -14,10 +15,12 @@ class VarsRuntime implements RuntimeExtensionInterface {
 
     private $container;
     private $em;
+    private $assetsManager;
 
-    public function __construct(ContainerInterface $container) {
+    public function __construct(ContainerInterface $container, Packages $assetsManager) {
         $this->container = $container;
         $this->em = $container->get('doctrine')->getManager();
+        $this->assetsManager = $assetsManager;
     }
 
     /**
@@ -29,13 +32,16 @@ class VarsRuntime implements RuntimeExtensionInterface {
      * @return string
      */
     public function getDynamicContentAttribute($dynamicContentAttributeId) {
-        $dynamicContentAttribute = $this->em->getRepository('ContentBundle:DynamicContentAttribute')->find($dynamicContentAttributeId);
+        $dynamicContentAttribute = $this->em->getRepository('PNContentBundle:DynamicContentAttribute')->find($dynamicContentAttributeId);
+
         if (!$dynamicContentAttribute) {
             return "";
         }
         if ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_IMAGE and $dynamicContentAttribute->getImage() != null) {
-            $manager = $this->container->get('assets.packages');
-            return $manager->getUrl($dynamicContentAttribute->getImage()->getAssetPath());
+            return $this->assetsManager->getUrl($dynamicContentAttribute->getImage()->getAssetPath());
+        } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_DOCUMENT and $dynamicContentAttribute->getDocument() != null) {
+            $params = ["document" => $dynamicContentAttribute->getDocument()->getId()];
+            return $this->container->get("router")->generate("download") . "?d=" . json_encode($params);
         }
         return $dynamicContentAttribute->getValue();
     }
