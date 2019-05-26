@@ -5,6 +5,7 @@ namespace PN\ContentBundle\Form\Translation;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use PN\ContentBundle\Form\Model\PostTypeModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
@@ -53,7 +54,7 @@ class PostTranslationType extends AbstractType {
                 $builder->add($name, TextareaType::class, $options);
             }
         } else {
-            throw new Exception('Invalid $attributes value passed to PostType');
+            throw new \Exception('Invalid $attributes value passed to PostType');
         }
     }
 
