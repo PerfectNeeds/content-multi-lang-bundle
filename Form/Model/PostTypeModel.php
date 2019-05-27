@@ -6,6 +6,11 @@ class PostTypeModel {
 
     private $children = [];
 
+    /**
+     * @param string $name
+     * @param string $label
+     * @param array $options
+     */
     public function add($name, $label, array $options = []) {
 
         $this->children[$name] = [
