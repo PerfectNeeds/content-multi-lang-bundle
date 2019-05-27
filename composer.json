@@ -15,7 +15,7 @@
         "symfony/framework-bundle": " ^3.4",
         "perfectneeds/service-bundle": "~1.0",
         "perfectneeds/locale-bundle": "~1.0",
-        "perfectneeds/media-bundle": "dev-master"
+        "perfectneeds/media-bundle": "~1.0"
     },
     "autoload": {
         "psr-4": {
