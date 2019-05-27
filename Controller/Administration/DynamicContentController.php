@@ -5,6 +5,7 @@ namespace PN\ContentBundle\Controller\Administration;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Form;
 use PN\ContentBundle\Entity\DynamicContent;
 use PN\ContentBundle\Form\DynamicContentType;
 use PN\ContentBundle\Entity\DynamicContentAttribute;
@@ -104,6 +105,36 @@ class DynamicContentController extends Controller {
     /**
      * Displays a form to edit an existing dynamicContent entity.
      *
+     * @Route("/{id}/edit-attribute", name="dynamic_content_attribute_edit", methods={"GET", "POST"})
+     */
+    public function editAttributeAction(Request $request, DynamicContentAttribute $dynamicContentAttribute) {
+        $this->denyAccessUnlessGranted("ROLE_ADMIN");
+        $editForm = $this->createForm(DynamicContentAttributeBundleType::class, [$dynamicContentAttribute]);
+        $editForm->handleRequest($request);
+
+        $em = $this->getDoctrine()->getManager();
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $imageUploader = $this->get('pn_media_upload_image');
+            $documentUploader = $this->get('pn_media_upload_document');
+            $languages = $em->getRepository('PNLocaleBundle:Language')->findAll();
+
+            $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $editForm, $languages, $imageUploader, $documentUploader);
+            $em->flush();
+
+            $this->addFlash("success", "Saved Successfully");
+
+            return $this->redirectToRoute('dynamic_content_attribute_edit', array('id' => $dynamicContentAttribute->getId()));
+        }
+
+        return $this->render('@PNContent/Administration/DynamicContent/editAttribute.html.twig', array(
+                    'dynamicContentAttribute' => $dynamicContentAttribute,
+                    'edit_form' => $editForm->createView(),
+        ));
+    }
+
+    /**
+     * Displays a form to edit an existing dynamicContent entity.
+     *
      * @Route("/{id}/data/edit", name="dynamic_content_attribute_data_edit", methods={"GET", "POST"})
      */
     public function editAttributeDataAction(Request $request, DynamicContent $dynamicContent) {
@@ -126,37 +157,11 @@ class DynamicContentController extends Controller {
 
         if ($eavForm->isSubmitted() && $eavForm->isValid()) {
             $imageUploader = $this->get('pn_media_upload_image');
+            $documentUploader = $this->get('pn_media_upload_document');
             $languages = $em->getRepository('PNLocaleBundle:Language')->findAll();
             $dynamicContentAttribute = new DynamicContentAttribute;
             foreach ($dynamicContentAttributes as $dynamicContentAttribute) {
-                $value = $eavForm->get($dynamicContentAttribute->getId())->getData();
-                if ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_IMAGE) {
-                    if ($value !== null) {
-                        // upload Image
-                        $imageUploader->uploadSingleImage($dynamicContentAttribute, $value, 80, $request, Image::TYPE_MAIN);
-                        $dynamicContentAttribute->setValue(null);
-                    }
-                } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_DOCUMENT) {
-                    if ($value !== null) {
-                        dump($value);
-                        $this->get('pn_media_upload_document')->uploadSingleDocument($dynamicContentAttribute, $value, 80, $request);
-                        $dynamicContentAttribute->setValue(null);
-                    }
-                } else {
-
-                    $dynamicContentAttribute->setValue($value);
-                    foreach ($languages as $language) {
-                        $valueTranslated = $eavForm->get($dynamicContentAttribute->getId() . "_" . $language->getLocale())->getData();
-                        $dynamicContentAttributeTranslation = $this->get('vm5_entity_translations.translator')->getTranslation($dynamicContentAttribute, $language->getLocale());
-                        if (!$dynamicContentAttributeTranslation) {
-                            $dynamicContentAttributeTranslation = new DynamicContentAttributeTranslation();
-                        }
-                        $dynamicContentAttributeTranslation->setLanguage($language);
-                        $dynamicContentAttributeTranslation->setValue($valueTranslated);
-                        $dynamicContentAttribute->addTranslation($dynamicContentAttributeTranslation);
-                    }
-                }
-                $em->persist($dynamicContentAttribute);
+                $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $eavForm, $languages, $imageUploader, $documentUploader);
             }
             $em->flush();
 
@@ -170,6 +175,36 @@ class DynamicContentController extends Controller {
                     'attr_form' => $attrForm->createView(),
                     'eav_form' => $eavForm->createView(),
         ));
+    }
+
+    private function persistDynamicContentAttribute(DynamicContentAttribute $dynamicContentAttribute, Request $request, Form $form, $languages, $imageUploader, $documentUploader) {
+        $value = $form->get($dynamicContentAttribute->getId())->getData();
+        if ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_IMAGE) {
+            if ($value !== null) {
+                // upload Image
+                $imageUploader->uploadSingleImage($dynamicContentAttribute, $value, 80, $request, Image::TYPE_MAIN);
+                $dynamicContentAttribute->setValue(null);
+            }
+        } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_DOCUMENT) {
+            if ($value !== null) {
+                $documentUploader->uploadSingleDocument($dynamicContentAttribute, $value, 80, $request);
+                $dynamicContentAttribute->setValue(null);
+            }
+        } else {
+
+            $dynamicContentAttribute->setValue($value);
+            foreach ($languages as $language) {
+                $valueTranslated = $form->get($dynamicContentAttribute->getId() . "_" . $language->getLocale())->getData();
+                $dynamicContentAttributeTranslation = $this->get('vm5_entity_translations.translator')->getTranslation($dynamicContentAttribute, $language->getLocale());
+                if (!$dynamicContentAttributeTranslation) {
+                    $dynamicContentAttributeTranslation = new DynamicContentAttributeTranslation();
+                }
+                $dynamicContentAttributeTranslation->setLanguage($language);
+                $dynamicContentAttributeTranslation->setValue($valueTranslated);
+                $dynamicContentAttribute->addTranslation($dynamicContentAttributeTranslation);
+            }
+        }
+        $this->getDoctrine()->getManager()->persist($dynamicContentAttribute);
     }
 
     /**

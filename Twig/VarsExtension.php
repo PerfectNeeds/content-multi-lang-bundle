@@ -20,7 +20,7 @@ class VarsExtension extends AbstractExtension {
 
     public function getFunctions() {
         return array(
-            new TwigFunction('getDCA', array(VarsRuntime::class, 'getDynamicContentAttribute')),
+            new TwigFunction('getDCA', array(VarsRuntime::class, 'getDynamicContentAttribute'), ['is_safe' => ['html']]),
         );
     }
 

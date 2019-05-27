@@ -62,39 +62,7 @@
                     <div class="panel-body">
                         <div class="row">
                             {% for attribute in dynamicContentAttributes %}
-                                {% if attribute.type == constant('PN\\ContentBundle\\Entity\\DynamicContentAttribute::TYPE_IMAGE')  %}
-                                    {{ macros.input(attribute(eav_form, attribute.id), 10,attribute.hint,null) }}
-                                    {% if attribute.image != false %}
-                                        <div class="col-xs-2 text-left">
-                                            <div class="thumb" >
-                                                <a href="{{ asset(attribute.image.assetPath) }}" data-popup="lightbox">
-                                                    <img src="{{ asset(attribute.image.assetPath) }}" alt="" style="height: 58px;object-fit: cover">
-                                                    <span class="zoom-image"><i class="icon-plus2"></i></span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                {% elseif attribute.type == constant('PN\\ContentBundle\\Entity\\DynamicContentAttribute::TYPE_DOCUMENT')  %}
-                                    {{ macros.input(attribute(eav_form, attribute.id), 10,attribute.hint,null) }}
-
-                                    {% if attribute.document != false %}
-                                        {% if attribute.document != false %}
-                                            <div class="col-xs-2">
-                                                <div class="form-group mt-5">
-                                                    <a href='{{ path('download', {'d': '{"document":'~ attribute.document.id ~'}'}) }}'  class="btn btn-info mt-20" title="{{ attribute.document.name }}">
-                                                        <i class="fa fa-download"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    {% endif %}
-                                {% else %}
-                                    {{ macros.input(attribute(eav_form, attribute.id), 6,attribute.hint,null) }}
-                                    {% for laguage in laguages %}
-                                        {{ macros.input(attribute(eav_form, attribute.id~"_"~laguage.locale), 6,attribute.hint,null) }}
-                                    {% endfor %}
-                                {% endif %}
-
+                                {% include '@PNContent/Administration/DynamicContent/editAttributeContent.html.twig' with {"dynamicContentAttribute": attribute, "form":eav_form} %}
                             {% endfor %}
                         </div>
                     </div>
@@ -106,8 +74,6 @@
             </div>
         </div>
     {% endif %}
-    {{ getDCA(1)}}
-    
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}

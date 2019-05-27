@@ -33,7 +33,6 @@ class VarsRuntime implements RuntimeExtensionInterface {
      */
     public function getDynamicContentAttribute($dynamicContentAttributeId) {
         $dynamicContentAttribute = $this->em->getRepository('PNContentBundle:DynamicContentAttribute')->find($dynamicContentAttributeId);
-
         if (!$dynamicContentAttribute) {
             return "";
         }
@@ -43,7 +42,27 @@ class VarsRuntime implements RuntimeExtensionInterface {
             $params = ["document" => $dynamicContentAttribute->getDocument()->getId()];
             return $this->container->get("router")->generate("download") . "?d=" . json_encode($params);
         }
-        return $dynamicContentAttribute->getValue();
+
+        $editBtn = $this->showEditBtn($dynamicContentAttribute);
+        return $dynamicContentAttribute->getValue() . $editBtn;
+    }
+
+    private function isGranted($attributes) {
+        if (!$this->container->has('security.authorization_checker')) {
+            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
+        }
+
+        return $this->container->get('security.authorization_checker')->isGranted($attributes, null);
+    }
+
+    private function showEditBtn(DynamicContentAttribute $dynamicContentAttribute) {
+        if ($this->isGranted("ROLE_ADMIN") == false) {
+            return '';
+        }
+
+        $url = $this->container->get("router")->generate("dynamic_content_attribute_edit", ['id' => $dynamicContentAttribute->getId()]);
+
+        return ' <a href="' . $url . '" target="popup" onclick="window.open(\'' . $url . '\',\'popup\',\'width=600,height=600\'); return false;">Edit</a>';
     }
 
 }

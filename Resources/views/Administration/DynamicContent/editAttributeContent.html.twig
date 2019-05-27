@@ -1,0 +1,32 @@
+{% if dynamicContentAttribute.type == constant('PN\\ContentBundle\\Entity\\DynamicContentAttribute::TYPE_IMAGE')  %}
+    {{ macros.input(attribute(form, dynamicContentAttribute.id), 10,dynamicContentAttribute.hint,null) }}
+    {% if dynamicContentAttribute.image != false %}
+        <div class="col-xs-2 text-left">
+            <div class="thumb" >
+                <a href="{{ asset(dynamicContentAttribute.image.assetPath) }}" data-popup="lightbox">
+                    <img src="{{ asset(dynamicContentAttribute.image.assetPath) }}" alt="" style="height: 58px;object-fit: cover">
+                    <span class="zoom-image"><i class="icon-plus2"></i></span>
+                </a>
+            </div>
+        </div>
+    {% endif %}
+{% elseif dynamicContentAttribute.type == constant('PN\\ContentBundle\\Entity\\DynamicContentAttribute::TYPE_DOCUMENT')  %}
+    {{ macros.input(attribute(form, dynamicContentAttribute.id), 10,dynamicContentAttribute.hint,null) }}
+
+    {% if dynamicContentAttribute.document != false %}
+        {% if dynamicContentAttribute.document != false %}
+            <div class="col-xs-2">
+                <div class="form-group mt-5">
+                    <a href='{{ path('download', {'d': '{"document":'~ dynamicContentAttribute.document.id ~'}'}) }}'  class="btn btn-info mt-20" title="{{ dynamicContentAttribute.document.name }}">
+                        <i class="fa fa-download"></i>
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% else %}
+    {{ macros.input(attribute(form, dynamicContentAttribute.id), 6,dynamicContentAttribute.hint,null) }}
+    {% for laguage in laguages %}
+        {{ macros.input(attribute(form, dynamicContentAttribute.id~"_"~laguage.locale), 6,dynamicContentAttribute.hint,null) }}
+    {% endfor %}
+{% endif %}

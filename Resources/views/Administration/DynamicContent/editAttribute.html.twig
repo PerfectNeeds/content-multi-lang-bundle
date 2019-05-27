@@ -1,0 +1,43 @@
+{% extends 'adminTemplate/base.html.twig' %}
+
+{% import 'adminTemplate/macros.html.twig' as macros %}
+{% set page_title %}Dynamic Content{% endset %}
+{% block breadcrumb %}
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>Dashboard</a></li>
+            <li><a href="{{ path('dynamic_content_index') }}">{{ page_title }}</a></li>
+            <li class="active">Edit {{ dynamicContentAttribute.title }}</li>
+        </ul>
+    </div>
+{% endblock %}
+{% block body %}
+    {% set laguages = pnLanguages() %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-flat">
+                {{ form_start(edit_form, {'attr':{"data-toggle":"validator",'novalidate':'novalidate'}}) }}
+                <div class="panel-body">
+                    <div class="row">
+
+                        {% include '@PNContent/Administration/DynamicContent/editAttributeContent.html.twig' with {"dynamicContentAttribute": dynamicContentAttribute, "form":edit_form} %}
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    {% include 'adminTemplate/saveAndResetFormFooter.html.twig' %}
+                </div>
+                {{ form_end(edit_form) }}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/selects/select2.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/pages/form_select2.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/validation/validate.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/pages/form_validation.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/media/fancybox.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/styling/uniform.min.js') }}"></script>
+{% endblock javascripts %}
