@@ -43,7 +43,10 @@ class VarsRuntime implements RuntimeExtensionInterface {
             return $this->container->get("router")->generate("download") . "?d=" . json_encode($params);
         }
 
-        $editBtn = $this->showEditBtn($dynamicContentAttribute);
+        $editBtn = "";
+        if (in_array($dynamicContentAttribute->getType(), [DynamicContentAttribute::TYPE_TEXT, DynamicContentAttribute::TYPE_LONGTEXT])) {
+            $editBtn = $this->showEditBtn($dynamicContentAttribute);
+        }
         return $dynamicContentAttribute->getValue() . $editBtn;
     }
 
