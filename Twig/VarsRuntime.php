@@ -40,14 +40,15 @@ class VarsRuntime implements RuntimeExtensionInterface {
             return $this->assetsManager->getUrl($dynamicContentAttribute->getImage()->getAssetPath());
         } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_DOCUMENT and $dynamicContentAttribute->getDocument() != null) {
             $params = ["document" => $dynamicContentAttribute->getDocument()->getId()];
-            return $this->container->get("router")->generate("download") . "?d=" . json_encode($params);
+            return $this->container->get("router")->generate("download") . "?d=" . str_replace('"', "'", json_encode($params));
         }
 
         $editBtn = "";
         if (in_array($dynamicContentAttribute->getType(), [DynamicContentAttribute::TYPE_TEXT, DynamicContentAttribute::TYPE_LONGTEXT])) {
             $editBtn = $this->showEditBtn($dynamicContentAttribute);
         }
-        return $dynamicContentAttribute->getValue() . $editBtn;
+
+        return nl2br($dynamicContentAttribute->getValue()) . $editBtn;
     }
 
     private function isGranted($attributes) {
