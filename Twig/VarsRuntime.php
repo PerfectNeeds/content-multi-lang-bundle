@@ -66,7 +66,7 @@ class VarsRuntime implements RuntimeExtensionInterface {
 
         $url = $this->container->get("router")->generate("dynamic_content_attribute_edit", ['id' => $dynamicContentAttribute->getId()]);
 
-        return ' <a href="' . $url . '" target="popup" onclick="window.open(\'' . $url . '\',\'popup\',\'width=600,height=600\'); return false;">Edit</a>';
+        return ' <a href="' . $url . '" target="popup" onclick="window.open(\'' . $url . '\',\'popup\',\'width=600,height=600\'); return false;" title="Edit"><i class="fa fa-pencil"></i></a>';
     }
 
 }
