@@ -190,9 +190,15 @@ class PostController extends Controller {
             return new JsonResponse(['error' => 1, 'message' => 'Please enter image name']);
         }
 
+        if ($post->getMainImage() != null AND $imageType == Image::TYPE_MAIN) {
+            $filenameForRemove = $post->getMainImage()->getAbsoluteResizeExtension();
+            if (file_exists($filenameForRemove)) {
+                unlink($filenameForRemove);
+            }
+        }
+
         $imageUploader = $this->get('pn_media_upload_image');
         if ($imageSetting->getAutoResize() == TRUE) {
-
             // resize the image
             $imageUploader->resizeImageAndCreateThumbnail($image, $imageSetting->getId(), $imageType);
         }
