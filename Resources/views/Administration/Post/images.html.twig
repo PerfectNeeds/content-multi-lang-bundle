@@ -1,6 +1,5 @@
 {% extends 'adminTemplate/base.html.twig' %}
 {% set page_title %}Manage image gallery{% endset %}
-{% import 'adminTemplate/macros.html.twig' as macros %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -13,6 +12,9 @@
         <ul class="breadcrumb">
             <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>Dashboard</a></li>
             <li><a href="{{ path(imageSetting.backRoute, {'id' : entity.id}) }}">{{ imageSetting.entityName }}</a></li>
+            {% if entityTitle != null %}
+                <li><a href="{{ path(imageSetting.backRoute, {'id' : entity.id}) }}">{{ entityTitle }}</a></li>
+            {% endif %}
             <li class="active">{{ page_title }}</li>
         </ul>
     </div>
@@ -22,7 +24,7 @@
     <div class="tabbable panel login-form width-400">
         <div class="tab-content panel-body">
             <div class="tab-pane fade in active" id="basic-tab3">
-                {% include 'cms/admin/post/imagesContent.html.twig' with { 'imageSetting':imageSetting, 'entity':post } %}
+                {% include '@PNContent/Administration/Post/imagesContent.html.twig' with { 'imageSetting':imageSetting, 'entity':post } %}
             </div>
         </div>
     </div>

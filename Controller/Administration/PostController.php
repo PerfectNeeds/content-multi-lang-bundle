@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use PN\MediaBundle\Entity\Image;
-use PN\ContentBundle\Entity\Post;
 use PN\ServiceBundle\Service\CommonFunctionService;
 use PN\ServiceBundle\Service\ContainerParameterService;
 use PN\ServiceBundle\Utils\Validate;
@@ -46,10 +45,18 @@ class PostController extends Controller {
         $entityName = $this->get(CommonFunctionService::class)->getClassNameByObject($entity);
         $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
 
+        $entityTitle = null;
+        if (method_exists($entity, "getTitle")) {
+            $entityTitle = $entity->getTitle();
+        } elseif (method_exists($entity, "getName")) {
+            $entityTitle = $entity->getName();
+        }
+
         return $this->render('@PNContent/Administration/Post/images.html.twig', [
                     'post' => $post,
                     'imageSetting' => $imageSetting,
                     'entity' => $entity,
+                    'entityTitle' => $entityTitle,
         ]);
     }
 

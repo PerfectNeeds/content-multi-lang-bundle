@@ -49,9 +49,9 @@ class PostTranslationType extends AbstractType {
                 ];
 
                 if (count($options) > 0) {
-                    $options = array_merge($fieldOptions, $options);
+                    $fieldOptions = array_merge($fieldOptions, $options);
                 }
-                $builder->add($name, TextareaType::class, $options);
+                $builder->add($name, TextareaType::class, $fieldOptions);
             }
         } else {
             throw new \Exception('Invalid $attributes value passed to PostType');

@@ -55,7 +55,7 @@
                     {% for radioButton in imageSetting.notRadioButton %}
                         {% set radioButtonArray = radioButtonArray|merge([radioButton.imageType.id]) %}
                     {% endfor %}
-                    {% include 'cms/admin/post/imageItem.html.twig' with {'image':image} %}
+                    {% include '@PNContent/Administration/Post/imageItem.html.twig' with {'image':image} %}
                 {% endfor %}
             </tbody>
         </table>
