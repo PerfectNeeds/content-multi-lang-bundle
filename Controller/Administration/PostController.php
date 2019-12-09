@@ -164,6 +164,25 @@ class PostController extends Controller {
         return new JsonResponse(['error' => 0, 'message' => 'Deleted successfully']);
     }
 
+    private function validateImageDimension(Image $image, $imageSettingWithType) {
+
+        if ($imageSettingWithType !== false and $imageSettingWithType->getValidateWidthAndHeight() == true) {
+            $originalPath = $image->getUploadRootDirWithFileName();
+            $height = $imageSettingWithType->getHeight();
+            $width = $imageSettingWithType->getWidth();
+
+            list($currentWidth, $currentHeight) = getimagesize($originalPath);
+
+            if ($width != null and $currentWidth != $width) {
+                return false;
+            }
+            if ($height != null and $currentHeight != $height) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Displays a form to create a new PropertyGallery entity.
      *
@@ -204,6 +223,13 @@ class PostController extends Controller {
             }
         }
 
+        $imageSettingWithType = $imageSetting->getTypeId($imageType);
+        $validateImageDimension = $this->validateImageDimension($image, $imageSettingWithType);
+        if (!$validateImageDimension) {
+            $message = "This image dimensions are wrong, please upload one with the right dimensions";
+            return new JsonResponse(["erorr" => 1, 'message' => $message]);
+        }
+
         $imageUploader = $this->get('pn_media_upload_image');
         if ($imageSetting->getAutoResize() == TRUE) {
             // resize the image
@@ -217,7 +243,7 @@ class PostController extends Controller {
             'imageSetting' => $imageSetting,
         ]);
 
-        return new JsonResponse(['message' => 'Done', 'returnData' => $returnData]);
+        return new JsonResponse(['error' => 0, 'message' => 'Done', 'returnData' => $returnData]);
     }
 
     /**

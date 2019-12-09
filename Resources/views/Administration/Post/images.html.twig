@@ -12,9 +12,9 @@
         <ul class="breadcrumb">
             <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>Dashboard</a></li>
             <li><a href="{{ path(imageSetting.backRoute, {'id' : entity.id}) }}">{{ imageSetting.entityName }}</a></li>
-            {% if entityTitle != null %}
+                {% if entityTitle != null %}
                 <li><a href="{{ path(imageSetting.backRoute, {'id' : entity.id}) }}">{{ entityTitle }}</a></li>
-            {% endif %}
+                {% endif %}
             <li class="active">{{ page_title }}</li>
         </ul>
     </div>
@@ -243,8 +243,13 @@
                     },
                     data: {'image_id': imageId, 'type': type},
                     success: function (result) {
-                        $this.parents('.image-row').replaceWith(result.returnData);
-                        successNotify(result.message);
+                        if (result.erorr == 0) {
+                            $this.parents('.image-row').replaceWith(result.returnData);
+                            successNotify(result.message);
+                        } else {
+                            errorNotify(result.message);
+                            $this.prop('checked', false);
+                        }
 
                     }
                 });
@@ -265,8 +270,13 @@
                     },
                     data: {'image_id': imageId, 'type': type},
                     success: function (result) {
-                        $this.parents('.image-row').replaceWith(result.returnData);
-                        successNotify(result.message);
+                        if (result.erorr == 0) {
+                            $this.parents('.image-row').replaceWith(result.returnData);
+                            successNotify(result.message);
+                        } else {
+                            errorNotify(result.message);
+                            $this.prop('checked', false);
+                        }
 
                     }
                 });
