@@ -62,6 +62,7 @@
                     <div class="panel-body">
                         <div class="row">
                             {% for attribute in dynamicContentAttributes %}
+                                {% if loop.index % 2 %}</div><div class="row">{% endif %}
                                 {% include '@PNContent/Administration/DynamicContent/editAttributeContent.html.twig' with {"dynamicContentAttribute": attribute, "form":eav_form} %}
                             {% endfor %}
                         </div>
