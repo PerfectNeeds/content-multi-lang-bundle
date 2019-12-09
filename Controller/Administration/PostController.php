@@ -227,7 +227,7 @@ class PostController extends Controller {
         $validateImageDimension = $this->validateImageDimension($image, $imageSettingWithType);
         if (!$validateImageDimension) {
             $message = "This image dimensions are wrong, please upload one with the right dimensions";
-            return new JsonResponse(["erorr" => 1, 'message' => $message]);
+            return new JsonResponse(["error" => 1, 'message' => $message]);
         }
 
         $imageUploader = $this->get('pn_media_upload_image');
