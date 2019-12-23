@@ -260,29 +260,16 @@ class PostController extends Controller {
             return new JsonResponse($return);
         }
 
-        $listJson = $request->request->get('json');
-        $sortedList = json_decode($listJson);
+        $sortedList = $request->request->get('image');
         $i = 1;
-        foreach ($sortedList as $key => $value) {
-            if (!array_key_exists($key, $sortedList)) {
+        foreach ($sortedList as $value) {
+            $image = $em->getRepository($this->imageClass)->find($value);
+            if ($image->getPosts()->first()->getId() != $post->getId()) {
                 continue;
             }
-            $sortedListNod = $sortedList[$key];
-            foreach ($sortedListNod as $keyNod => $valueNod) {
-                if (!array_key_exists($key, $sortedList)) {
-                    continue;
-                }
-                if (!isset($valueNod->id)) {
-                    continue;
-                }
-                $image = $em->getRepository($this->imageClass)->find($valueNod->id);
-                if ($image->getPosts()->first()->getId() != $post->getId()) {
-                    continue;
-                }
-                $image->setTarteb($i);
-                $em->persist($image);
-                $i++;
-            }
+            $image->setTarteb($i);
+            $em->persist($image);
+            $i++;
         }
         $em->flush();
 
