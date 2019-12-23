@@ -50,7 +50,7 @@
             </thead>
             <tbody id="image-list">
 
-                {% for image in entity.images|reverse %}
+                {% for image in entity.images %}
                     {% set radioButtonArray = [] %}
                     {% for radioButton in imageSetting.notRadioButton %}
                         {% set radioButtonArray = radioButtonArray|merge([radioButton.imageType.id]) %}

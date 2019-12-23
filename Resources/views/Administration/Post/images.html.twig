@@ -90,7 +90,7 @@
                 if ((data.response).length > 0) {
                     $('#noFiles').addClass('hidden');
                     $.each(data.response, function (index, value) {
-                        $('#image-list').prepend(value);
+                        $('#image-list').append(value);
                         initXeditable();
                     });
                 }
