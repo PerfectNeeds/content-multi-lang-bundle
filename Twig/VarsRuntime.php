@@ -31,7 +31,7 @@ class VarsRuntime implements RuntimeExtensionInterface {
      * @param type $dynamicContentAttributeId
      * @return string
      */
-    public function getDynamicContentAttribute($dynamicContentAttributeId) {
+    public function getDynamicContentAttribute($dynamicContentAttributeId, $showEditBtn = true) {
         $dynamicContentAttribute = $this->em->getRepository('PNContentBundle:DynamicContentAttribute')->find($dynamicContentAttributeId);
         if (!$dynamicContentAttribute) {
             return "";
@@ -44,7 +44,7 @@ class VarsRuntime implements RuntimeExtensionInterface {
         }
 
         $editBtn = "";
-        if (in_array($dynamicContentAttribute->getType(), [DynamicContentAttribute::TYPE_TEXT, DynamicContentAttribute::TYPE_LONGTEXT])) {
+        if ($showEditBtn == true and in_array($dynamicContentAttribute->getType(), [DynamicContentAttribute::TYPE_TEXT, DynamicContentAttribute::TYPE_LONGTEXT])) {
             $editBtn = $this->showEditBtn($dynamicContentAttribute->getId());
         }
 
