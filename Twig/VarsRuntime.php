@@ -27,12 +27,11 @@ class VarsRuntime implements RuntimeExtensionInterface {
      * get DynamicContentAttribute by ID
      *
      * @example {{ getDCA(11) }}
-     * @example {{ getDCA(11, false) }}
      *
      * @param type $dynamicContentAttributeId
      * @return string
      */
-    public function getDynamicContentAttribute($dynamicContentAttributeId, $showEditBtn = true) {
+    public function getDynamicContentAttribute($dynamicContentAttributeId) {
         $dynamicContentAttribute = $this->em->getRepository('PNContentBundle:DynamicContentAttribute')->find($dynamicContentAttributeId);
         if (!$dynamicContentAttribute) {
             return "";
@@ -45,11 +44,23 @@ class VarsRuntime implements RuntimeExtensionInterface {
         }
 
         $editBtn = "";
-        if ($showEditBtn == true and in_array($dynamicContentAttribute->getType(), [DynamicContentAttribute::TYPE_TEXT, DynamicContentAttribute::TYPE_LONGTEXT])) {
-            $editBtn = $this->showEditBtn($dynamicContentAttribute);
+        if (in_array($dynamicContentAttribute->getType(), [DynamicContentAttribute::TYPE_TEXT, DynamicContentAttribute::TYPE_LONGTEXT])) {
+            $editBtn = $this->showEditBtn($dynamicContentAttribute->getId());
         }
 
         return nl2br($dynamicContentAttribute->getValue()) . $editBtn;
+    }
+
+    /**
+     * edit DynamicContentAttribute by ID
+     *
+     * @example {{ editDCA(11) }}
+     *
+     * @param type $dynamicContentAttributeId
+     * @return string
+     */
+    public function editDynamicContentAttribute($dynamicContentAttributeId) {
+        return $this->showEditBtn($dynamicContentAttributeId);
     }
 
     private function isGranted($attributes) {
@@ -60,12 +71,12 @@ class VarsRuntime implements RuntimeExtensionInterface {
         return $this->container->get('security.authorization_checker')->isGranted($attributes, null);
     }
 
-    private function showEditBtn(DynamicContentAttribute $dynamicContentAttribute) {
+    private function showEditBtn($dynamicContentAttributeId) {
         if ($this->isGranted("ROLE_ADMIN") == false) {
             return '';
         }
 
-        $url = $this->container->get("router")->generate("dynamic_content_attribute_edit", ['id' => $dynamicContentAttribute->getId()]);
+        $url = $this->container->get("router")->generate("dynamic_content_attribute_edit", ['id' => $dynamicContentAttributeId]);
 
         return ' <a href="' . $url . '" target="popup" onclick="window.open(\'' . $url . '\',\'popup\',\'width=600,height=600\'); return false;" title="Edit"><i class="fa fa-pencil"></i></a>';
     }

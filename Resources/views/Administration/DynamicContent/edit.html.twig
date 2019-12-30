@@ -42,6 +42,26 @@
                         {{ macros.input(attr_form.hint, 4) }}
                         {{ macros.input(attr_form.type, 4, null,null, 'form-control select-search') }}
                     </div>
+                    <div class="row hidden" id="imageDimensions">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{ form_label(attr_form.imageWidth) }}
+                                <div class="input-group">
+                                    {{ form_widget(attr_form.imageWidth) }}
+                                    <span class="input-group-addon">px</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{ form_label(attr_form.imageHeight) }}
+                                <div class="input-group">
+                                    {{ form_widget(attr_form.imageHeight) }}
+                                    <span class="input-group-addon">px</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="panel-footer">
                     {% include 'adminTemplate/saveAndResetFormFooter.html.twig' %}
@@ -82,6 +102,25 @@
     <script type="text/javascript" src="{{ asset('admin/js/pages/form_select2.js') }}"></script>
     <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/validation/validate.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('admin/js/pages/form_validation.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('admin/js/pages/components_thumbnails.js') }}"></script>
     <script type="text/javascript" src="{{ asset('admin/js/plugins/media/fancybox.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/styling/uniform.min.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            showImageimageDimensionsInputes();
+
+            $("#pn_bundle_cmsbundle_dynamiccontentattribute_type").change(function () {
+                showImageimageDimensionsInputes();
+            });
+        });
+        function showImageimageDimensionsInputes() {
+            var selected = $("#pn_bundle_cmsbundle_dynamiccontentattribute_type").find("option:selected");
+            console.log(selected);
+            if (selected.val() == "{{ constant('\\PN\\ContentBundle\\Entity\\DynamicContentAttribute::TYPE_IMAGE') }}") {
+                $("#imageDimensions").removeClass("hidden");
+            } else {
+                $("#imageDimensions").addClass("hidden");
+            }
+        }
+    </script>
 {% endblock javascripts %}

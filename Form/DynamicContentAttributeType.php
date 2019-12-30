@@ -21,7 +21,9 @@ class DynamicContentAttributeType extends AbstractType {
                     "placeholder" => "Please select",
                     "choices" => DynamicContentAttribute::$types
                 ])
-                ->add("hint", TextType::class, ["required" => false]);
+                ->add("hint", TextType::class, ["required" => false])
+                ->add("imageWidth", NumberType::class, ["required" => false])
+                ->add("imageHeight", NumberType::class, ["required" => false]);
     }
 
     /**

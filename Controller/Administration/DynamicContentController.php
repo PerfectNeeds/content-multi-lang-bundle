@@ -114,14 +114,10 @@ class DynamicContentController extends Controller {
 
         $em = $this->getDoctrine()->getManager();
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $imageUploader = $this->get('pn_media_upload_image');
-            $documentUploader = $this->get('pn_media_upload_document');
             $languages = $em->getRepository('PNLocaleBundle:Language')->findAll();
 
-            $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $editForm, $languages, $imageUploader, $documentUploader);
+            $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $editForm, $languages);
             $em->flush();
-
-            $this->addFlash("success", "Saved Successfully");
 
             return $this->redirectToRoute('dynamic_content_attribute_edit', array('id' => $dynamicContentAttribute->getId()));
         }
@@ -156,12 +152,10 @@ class DynamicContentController extends Controller {
         $eavForm->handleRequest($request);
 
         if ($eavForm->isSubmitted() && $eavForm->isValid()) {
-            $imageUploader = $this->get('pn_media_upload_image');
-            $documentUploader = $this->get('pn_media_upload_document');
             $languages = $em->getRepository('PNLocaleBundle:Language')->findAll();
             $dynamicContentAttribute = new DynamicContentAttribute;
             foreach ($dynamicContentAttributes as $dynamicContentAttribute) {
-                $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $eavForm, $languages, $imageUploader, $documentUploader);
+                $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $eavForm, $languages);
             }
             $em->flush();
 
@@ -177,22 +171,25 @@ class DynamicContentController extends Controller {
         ));
     }
 
-    private function persistDynamicContentAttribute(DynamicContentAttribute $dynamicContentAttribute, Request $request, Form $form, $languages, $imageUploader, $documentUploader) {
+    private function persistDynamicContentAttribute(DynamicContentAttribute $dynamicContentAttribute, Request $request, Form $form, $languages) {
         $value = $form->get($dynamicContentAttribute->getId())->getData();
         if ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_IMAGE) {
             if ($value !== null) {
                 // upload Image
-                $imageUploader->uploadSingleImage($dynamicContentAttribute, $value, 80, $request, Image::TYPE_MAIN);
+                $this->uploadImage($request, $dynamicContentAttribute, $value);
                 $dynamicContentAttribute->setValue(null);
             }
         } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_DOCUMENT) {
             if ($value !== null) {
+                $documentUploader = $this->get('pn_media_upload_document');
                 $documentUploader->uploadSingleDocument($dynamicContentAttribute, $value, 80, $request);
                 $dynamicContentAttribute->setValue(null);
             }
         } else {
 
             $dynamicContentAttribute->setValue($value);
+            $dynamicContentAttribute->setImageWidth(null);
+            $dynamicContentAttribute->setImageHeight(null);
             foreach ($languages as $language) {
                 $valueTranslated = $form->get($dynamicContentAttribute->getId() . "_" . $language->getLocale())->getData();
                 $dynamicContentAttributeTranslation = $this->get('vm5_entity_translations.translator')->getTranslation($dynamicContentAttribute, $language->getLocale());
@@ -205,6 +202,37 @@ class DynamicContentController extends Controller {
             }
         }
         $this->getDoctrine()->getManager()->persist($dynamicContentAttribute);
+    }
+
+    private function uploadImage(Request $request, DynamicContentAttribute $dynamicContentAttribute, $value) {
+        $validateImageDimensions = $this->validateImageDimensions($dynamicContentAttribute, $value);
+        if ($validateImageDimensions == false) {
+            return false;
+        }
+
+        $imageUploader = $this->get('pn_media_upload_image');
+        $imageUploader->uploadSingleImage($dynamicContentAttribute, $value, 80, $request, Image::TYPE_MAIN);
+    }
+
+    private function validateImageDimensions(DynamicContentAttribute $dynamicContentAttribute, $value) {
+        $width = $dynamicContentAttribute->getImageWidth();
+        $height = $dynamicContentAttribute->getImageHeight();
+        if ($width == null or $height == null) {
+            return true;
+        }
+
+        list($currentWidth, $currentHeight) = getimagesize($value->getRealPath());
+
+        if ($width != null and $currentWidth != $width) {
+            $this->addFlash("error", "This image dimensions are wrong, please upload one with the right dimensions");
+            return false;
+        }
+        if ($height != null and $currentHeight != $height) {
+            $this->addFlash("error", "This image dimensions are wrong, please upload one with the right dimensions");
+            return false;
+        }
+
+        return true;
     }
 
     /**
