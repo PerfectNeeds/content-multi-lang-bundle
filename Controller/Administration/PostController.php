@@ -61,6 +61,38 @@ class PostController extends Controller {
     }
 
     /**
+     * @Route("/gallery-popup/{id}", name="post_images_popup", methods={"GET"})
+     */
+    public function imagesPopupAction($id) {
+        $this->denyAccessUnlessGranted('ROLE_IMAGE_GALLERY');
+
+        $em = $this->getDoctrine()->getManager();
+        $post = $em->getRepository($this->postClass)->find($id);
+        if (!$post) {
+            throw $this->createNotFoundException();
+        }
+
+
+        $entity = $post->getRelationalEntity();
+        $entityName = $this->get(CommonFunctionService::class)->getClassNameByObject($entity);
+        $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
+
+        $entityTitle = null;
+        if (method_exists($entity, "getTitle")) {
+            $entityTitle = $entity->getTitle();
+        } elseif (method_exists($entity, "getName")) {
+            $entityTitle = $entity->getName();
+        }
+
+        return $this->render('@PNContent/Administration/Post/imagesPopup.html.twig', [
+                    'post' => $post,
+                    'imageSetting' => $imageSetting,
+                    'entity' => $entity,
+                    'entityTitle' => $entityTitle,
+        ]);
+    }
+
+    /**
      * Set Images to Property.
      *
      * @Route("/gallery/{id}" , name="post_create_images", methods={"POST"})

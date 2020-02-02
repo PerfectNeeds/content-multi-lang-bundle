@@ -81,4 +81,9 @@ class VarsRuntime implements RuntimeExtensionInterface {
         return ' <a href="' . $url . '" target="popup" onclick="window.open(\'' . $url . '\',\'popup\',\'width=600,height=600\'); return false;" title="Edit"><i class="fa fa-pencil"></i></a>';
     }
 
+    public function openGalleryBtn($postId) {
+        $url = $this->container->get("router")->generate("post_images_popup", ['id' => $postId]);
+        return '<a href="' . $url . '" target="popup" onclick="window.open(\'' . $url . '\',\'popup\',\'width=600,height=600\'); return false;" class="btn btn-default">Open Gallery</a>';
+    }
+
 }

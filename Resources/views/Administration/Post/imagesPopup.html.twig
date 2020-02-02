@@ -1,0 +1,90 @@
+{% extends 'adminTemplate/base.html.twig' %}
+{% set page_title %}Manage image gallery{% endset %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('admin/css/extras/animate.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('admin/js/plugins/sortable/sortable.css') }}" rel="stylesheet" type="text/css">
+{% endblock stylesheets %}
+
+{% block breadcrumb %}
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>Dashboard</a></li>
+            <li><a href="{{ path(imageSetting.backRoute, {'id' : entity.id}) }}">{{ imageSetting.entityName }}</a></li>
+                {% if entityTitle != null %}
+                <li><a href="{{ path(imageSetting.backRoute, {'id' : entity.id}) }}">{{ entityTitle }}</a></li>
+                {% endif %}
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+{% endblock %}
+{% block body %}
+    <div class="panel panel-white">
+        <div class="panel-heading">
+            <h6 class="panel-title">{{ imageSetting.entityName }} Images</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table sorted_table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Link</th>
+                    </tr>
+
+                </thead>
+                <tbody id="image-list">
+
+                    {% for image in post.images %}
+                        <tr>
+                            <td class="no-padding-right" style="width: 45px;">
+                                <div class="thumb">
+                                    <img src="{{ asset(image.assetPath) }}">
+                                    <div class="caption-overflow">
+                                        <span>
+                                            <a href="{{ asset(image.assetPath) }}" data-popup="lightbox" rel="gallery"
+                                               class="btn border-white text-white btn-flat btn-icon btn-rounded"><i class="icon-zoomin3"></i></a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group">
+                                    <input type="text" value="{{ absolute_url(asset(image.assetPath)) }}" class="form-control">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default copy-to-clipboard" type="button" data-popup="tooltip"  data-original-title="Copy"><i class="icon-copy4"></i></button>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('admin/js/plugins/media/fancybox.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('admin/js/plugins/uploaders/fileinput/plugins/purify.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('admin/js/core/libraries/jquery_ui/interactions.min.js') }}" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".copy-to-clipboard").click(function (e) {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                var copyText = $(this).parents('.input-group').find('input');
+                $temp.val(copyText.val());
+                copyText.select();
+                document.execCommand("copy");
+                $temp.remove();
+                successNotify("Copied");
+            });
+            $('[data-popup="lightbox"]').fancybox({
+                padding: 3,
+                prevEffect: 'none',
+                nextEffect: 'none',
+            });
+        });
+    </script>
+{% endblock %}
