@@ -1,3 +1,5 @@
+{% import 'adminTemplate/macros.html.twig' as macros %}
+
 {% if dynamicContentAttribute.type == constant('PN\\ContentBundle\\Entity\\DynamicContentAttribute::TYPE_IMAGE')  %}
     {{ macros.input(attribute(form, dynamicContentAttribute.id), 10,dynamicContentAttribute.hint,null) }}
     {% if dynamicContentAttribute.image != false %}
