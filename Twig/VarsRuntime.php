@@ -6,6 +6,7 @@ use Twig\Extension\RuntimeExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use PN\ContentBundle\Entity\DynamicContentAttribute;
 use \Symfony\Component\Asset\Packages;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @author Peter Nassef <peter.nassef@gmail.com>
@@ -17,10 +18,11 @@ class VarsRuntime implements RuntimeExtensionInterface {
     private $em;
     private $assetsManager;
 
-    public function __construct(ContainerInterface $container, Packages $assetsManager) {
+    public function __construct(ContainerInterface $container, TokenStorageInterface $tokenStorage, Packages $assetsManager) {
         $this->container = $container;
         $this->em = $container->get('doctrine')->getManager();
         $this->assetsManager = $assetsManager;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -66,6 +68,9 @@ class VarsRuntime implements RuntimeExtensionInterface {
     private function isGranted($attributes) {
         if (!$this->container->has('security.authorization_checker')) {
             throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
+        }
+        if ($this->tokenStorage->getToken() == null) {
+            return false;
         }
 
         return $this->container->get('security.authorization_checker')->isGranted($attributes, null);
