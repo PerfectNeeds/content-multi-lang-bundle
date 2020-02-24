@@ -43,6 +43,8 @@ class VarsRuntime implements RuntimeExtensionInterface {
         } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_DOCUMENT and $dynamicContentAttribute->getDocument() != null) {
             $params = ["document" => $dynamicContentAttribute->getDocument()->getId()];
             return $this->container->get("router")->generate("download") . "?d=" . str_replace('"', "'", json_encode($params));
+        } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_HTML) {
+            return $dynamicContentAttribute->getValue();
         }
 
         $editBtn = "";
