@@ -42,6 +42,7 @@ class DynamicContentAttributeBundleType extends AbstractType {
                     $attr["maxlength"] = 100;
                     break;
                 case DynamicContentAttribute::TYPE_LONGTEXT:
+                case DynamicContentAttribute::TYPE_HTML:
                     $inputType = TextareaType::class;
                     break;
                 case DynamicContentAttribute::TYPE_LINK:
