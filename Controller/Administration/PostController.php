@@ -262,7 +262,7 @@ class PostController extends Controller {
             return new JsonResponse(["error" => 1, 'message' => $message]);
         }
 
-        $maxFileSize = 1024; //1MB
+        $maxFileSize = 1024000; //1MB
         if ($imageSettingWithType->getValidateSize() == true  and $image->getSize() > $maxFileSize) {
             $message = sprintf("The image uploaded must be max %s", "1MB");
             return new JsonResponse(["error" => 1, 'message' => $message]);
