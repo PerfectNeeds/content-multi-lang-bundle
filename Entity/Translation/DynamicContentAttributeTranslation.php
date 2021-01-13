@@ -3,7 +3,7 @@
 namespace PN\ContentBundle\Entity\Translation;
 
 use Doctrine\ORM\Mapping as ORM;
-use VM5\EntityTranslationsBundle\Model\EditableTranslation;
+use Arxy\EntityTranslationsBundle\Model\EditableTranslation;
 use PN\LocaleBundle\Model\TranslationEntity;
 
 /**

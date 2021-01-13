@@ -65,7 +65,7 @@ class DynamicContentAttributeBundleType extends AbstractType {
                 $builder->add($attribute->getId(), $inputType, ["label" => $lable, "constraints" => $constraints, 'data' => $inputValue, "required" => false, "attr" => $attr, "data_class" => null]);
                 if (!in_array($attribute->getType(), [DynamicContentAttribute::TYPE_IMAGE, DynamicContentAttribute::TYPE_DOCUMENT])) {
                     foreach ($languages as $language) {
-                        $translation = $this->container->get('vm5_entity_translations.translator')->getTranslation($attribute, $language->getLocale());
+                        $translation = $this->container->get('arxy_entity_translations.translator')->getTranslation($attribute, $language->getLocale());
                         $translatedValue = null;
                         if ($translation) {
                             $translatedValue = $translation->getValue();

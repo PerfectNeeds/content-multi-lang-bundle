@@ -192,7 +192,7 @@ class DynamicContentController extends Controller {
             $dynamicContentAttribute->setImageHeight(null);
             foreach ($languages as $language) {
                 $valueTranslated = $form->get($dynamicContentAttribute->getId() . "_" . $language->getLocale())->getData();
-                $dynamicContentAttributeTranslation = $this->get('vm5_entity_translations.translator')->getTranslation($dynamicContentAttribute, $language->getLocale());
+                $dynamicContentAttributeTranslation = $this->get('arxy_entity_translations.translator')->getTranslation($dynamicContentAttribute, $language->getLocale());
                 if (!$dynamicContentAttributeTranslation) {
                     $dynamicContentAttributeTranslation = new DynamicContentAttributeTranslation();
                 }

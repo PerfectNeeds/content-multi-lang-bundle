@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use PN\ContentBundle\Form\Model\PostTypeModel;
-use VM5\EntityTranslationsBundle\Form\Type\TranslationsType;
+use Arxy\EntityTranslationsBundle\Form\Type\TranslationsType;
 
 class PostType extends AbstractType {
 

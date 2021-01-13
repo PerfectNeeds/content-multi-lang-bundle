@@ -36,7 +36,7 @@ public function registerBundles()
 {
     $bundles = array(
         // ...
-        new VM5\EntityTranslationsBundle\VM5EntityTranslationsBundle(),
+        new Arxy\EntityTranslationsBundle\ArxyEntityTranslationsBundle(),
         new PN\MediaBundle\PNMediaBundle(),
         new \PN\LocaleBundle\PNLocaleBundle(),
         new \PN\ServiceBundle\PNServiceBundle(),
@@ -88,7 +88,7 @@ If you're persisting your post via the Doctrine ORM, then your `Post` class shou
 namespace PN\Bundle\ContentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use VM5\EntityTranslationsBundle\Model\Translatable;
+use Arxy\EntityTranslationsBundle\Model\Translatable;
 
 // DON'T forget the following use statement!!!
 use PN\ContentBundle\Entity\Post as BasePost;
@@ -171,7 +171,7 @@ doctrine:
    orm:
         # search for the "ResolveTargetEntityListener" class for an article about this
         resolve_target_entities: 
-            VM5\EntityTranslationsBundle\Model\Language: PN\LocaleBundle\Entity\Language
+            Arxy\EntityTranslationsBundle\Model\Language: PN\LocaleBundle\Entity\Language
             PN\MediaBundle\Entity\Image: PN\Bundle\MediaBundle\Entity\Image
             PN\MediaBundle\Entity\Document: PN\Bundle\MediaBundle\Entity\Document
 
@@ -226,7 +226,7 @@ Post.php
 namespace PN\Bundle\ContentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use VM5\EntityTranslationsBundle\Model\Translatable;
+use Arxy\EntityTranslationsBundle\Model\Translatable;
 use PN\ContentBundle\Entity\Post as BasePost;
 use PN\ContentBundle\Model\PostTrait;
 
@@ -266,7 +266,7 @@ namespace PN\Bundle\CMSBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use PN\ServiceBundle\Model\DateTimeTrait;
-use VM5\EntityTranslationsBundle\Model\Translatable;
+use Arxy\EntityTranslationsBundle\Model\Translatable;
 use PN\LocaleBundle\Model\LocaleTrait;
 
 /**
