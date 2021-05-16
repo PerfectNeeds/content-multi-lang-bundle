@@ -26,7 +26,7 @@
                 <input type="radio" name="main_{{ radioButton.imageType.id }}" class="set-main-image"
                        data-type="{{ radioButton.imageType.id }}"
                        value="{{ image.id }}" {{ disable }} {% if post.imageByType(radioButton.imageType.id) != false and post.imageByType(radioButton.imageType.id).id == image.id %}checked=""{% endif %}>
-                {{ radioButton.imageType.name }}
+                {{ radioButton.imageType.name|trans }}
             </label>
             <br>
         {% endfor %}
@@ -40,23 +40,23 @@
 
             <label>
                 <input type="checkbox" class="set-other-image" data-type="{{ notRadioButton.imageType.id }}" value="{{ image.id }}" {{ checked }}>
-                {{ notRadioButton.imageType.name }}
+                {{ notRadioButton.imageType.name|trans }}
             </label>
         {% endfor %}
 
     </td>
     <td>
-        <a href="#" class="input-update-name" data-type="text" data-clear="false" data-ext="{{ image.nameExtension }}" data-inputclass="form-control" data-value="{{ image.nameWithoutExtension }}" data-pk="{{ image.id }}" data-title="Update image name">{{ image.nameWithoutExtension }}</a>
+        <a href="#" class="input-update-name" data-type="text" data-clear="false" data-ext="{{ image.nameExtension }}" data-inputclass="form-control" data-value="{{ image.nameWithoutExtension }}" data-pk="{{ image.id }}" data-title="{% trans %}Update image name{% endtrans %}">{{ image.nameWithoutExtension }}</a>
     </td>
     <td>
         <div class="input-group">
         <input type="text" value="{{ image.alt }}" class="form-control imageAlt" name="data[alt][{{ image.id }}]">
             <span class="input-group-btn">
-                <button class="btn btn-default update-image-alt" type="button" data-id="{{ image.id }}" data-popup="tooltip"  data-original-title="Update alt"><i class="icon-reload-alt"></i></button>
+                <button class="btn btn-default update-image-alt" type="button" data-id="{{ image.id }}" data-popup="tooltip"  data-original-title="{% trans %}Update alt{% endtrans %}"><i class="icon-reload-alt"></i></button>
             </span>
         </div>
     </td>
     <td class="text-center">
-        <a href="#" class="btn-default delete" data-id="{{ image.id }}"><i class="icon-trash" data-popup="tooltip" title="" data-original-title="Delete"></i></a>
+        <a href="#" class="btn-default delete" data-id="{{ image.id }}"><i class="icon-trash" data-popup="tooltip" title="" data-original-title="{% trans %}Delete{% endtrans %}"></i></a>
     </td>
 </tr>

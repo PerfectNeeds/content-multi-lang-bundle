@@ -1,5 +1,5 @@
 {% extends 'adminTemplate/base.html.twig' %}
-{% set page_title %}Manage image gallery{% endset %}
+{% set page_title %}{% trans %}Manage image gallery{% endtrans %}{% endset %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -10,8 +10,8 @@
 {% block breadcrumb %}
     <div class="breadcrumb-line">
         <ul class="breadcrumb">
-            <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>Dashboard</a></li>
-            <li><a href="{{ path(imageSetting.backRoute, {'id' : entity.id}) }}">{{ imageSetting.entityName }}</a></li>
+            <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>{% trans %}Dashboard{% endtrans %}</a></li>
+            <li><a href="{{ path(imageSetting.backRoute, {'id' : entity.id}) }}">{{ imageSetting.entityName|trans }}</a></li>
                 {% if entityTitle != null %}
                 <li><a href="{{ path(imageSetting.backRoute, {'id' : entity.id}) }}">{{ entityTitle }}</a></li>
                 {% endif %}
@@ -22,14 +22,14 @@
 {% block body %}
     <div class="panel panel-white">
         <div class="panel-heading">
-            <h6 class="panel-title">{{ imageSetting.entityName }} Images</h6>
+            <h6 class="panel-title">{{ imageSetting.entityName|trans }} {% trans %}Images{% endtrans %}</h6>
         </div>
         <div class="table-responsive">
             <table class="table sorted_table">
                 <thead>
                     <tr>
-                        <th>Image</th>
-                        <th>Link</th>
+                        <th>{% trans %}Image{% endtrans %}</th>
+                        <th>{% trans %}Link{% endtrans %}</th>
                     </tr>
 
                 </thead>
@@ -52,7 +52,7 @@
                                 <div class="input-group">
                                     <input type="text" value="{{ absolute_url(asset(image.assetPath)) }}" class="form-control">
                                     <span class="input-group-btn">
-                                        <button class="btn btn-default copy-to-clipboard" type="button" data-popup="tooltip"  data-original-title="Copy"><i class="icon-copy4"></i></button>
+                                        <button class="btn btn-default copy-to-clipboard" type="button" data-popup="tooltip"  data-original-title="{% trans %}Copy{% endtrans %}"><i class="icon-copy4"></i></button>
                                     </span>
                                 </div>
                             </td>
@@ -78,7 +78,7 @@
                 copyText.select();
                 document.execCommand("copy");
                 $temp.remove();
-                successNotify("Copied");
+                successNotify("{% trans %}Copied{% endtrans %}");
             });
             $('[data-popup="lightbox"]').fancybox({
                 padding: 3,
