@@ -16,12 +16,19 @@
     <td>
         {% for radioButton in imageSetting.radioButton %}
             {% set disable ="" %}
-            {% if radioButtonArray is defined %}
-                {% if (image.imageType and image.imageType != radioButton.imageType.id and image.imageType not in radioButtonArray) or (image.imageType and image.imageType not in radioButtonArray and post.imageByType(radioButton.imageType.id) != false ) %}
-                    {% set disable %}disabled=""{% endset %}
-                {% endif %}
-            {% endif %}
+            {# {% if radioButtonArray is defined %} #}
+            {# {% if #}
+            {# (image.imageType and image.imageType != radioButton.imageType.id and image.imageType not in radioButtonArray) #}
+            {# or (image.imageType and image.imageType not in radioButtonArray and post.imageByType(radioButton.imageType.id) != false ) #}
+            {# %} #}
+            {# {% set disable = 'disabled' %} #}
+            {# {% endif %} #}
+            {# {% endif %} #}
 
+
+            {% if (image.imageType is not empty and image.imageType !=0 and image.imageType !=radioButton.imageType.id) and (radioButtonArray is defined and image.imageType not in radioButtonArray) %}
+                {% set disable = 'disabled' %}
+            {% endif %}
             <label>
                 <input type="radio" name="main_{{ radioButton.imageType.id }}" class="set-main-image"
                        data-type="{{ radioButton.imageType.id }}"
@@ -34,7 +41,7 @@
             {% set checked ="" %}
             {% if post.images([notRadioButton.imageType.id])|length > 0 %}
                 {% for selectedImage in post.images([notRadioButton.imageType.id]) if  image.id == selectedImage.id %}
-                    {% set checked %} checked=""{% endset %}
+                    {% set checked = "checked" %}
                 {% endfor %}
             {% endif %}
 
@@ -50,9 +57,9 @@
     </td>
     <td>
         <div class="input-group">
-        <input type="text" value="{{ image.alt }}" class="form-control imageAlt" name="data[alt][{{ image.id }}]">
+            <input type="text" value="{{ image.alt }}" class="form-control imageAlt" name="data[alt][{{ image.id }}]">
             <span class="input-group-btn">
-                <button class="btn btn-default update-image-alt" type="button" data-id="{{ image.id }}" data-popup="tooltip"  data-original-title="{% trans %}Update alt{% endtrans %}"><i class="icon-reload-alt"></i></button>
+                <button class="btn btn-default update-image-alt" type="button" data-id="{{ image.id }}" data-popup="tooltip" data-original-title="{% trans %}Update alt{% endtrans %}"><i class="icon-reload-alt"></i></button>
             </span>
         </div>
     </td>
