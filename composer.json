@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": "^5.5.9 || ^7.0",
+        "php": "^7.3 || ^8.0",
         "symfony/framework-bundle": "^4.4 || ^3.4",
         "perfectneeds/service-bundle": "~1.0",
         "perfectneeds/locale-bundle": "~2.0",
