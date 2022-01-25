@@ -2,45 +2,35 @@
 
 namespace PN\ContentBundle\Form;
 
+use PN\ContentBundle\Entity\DynamicContentAttribute;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use PN\ContentBundle\Entity\DynamicContentAttribute;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DynamicContentAttributeType extends AbstractType {
+class DynamicContentAttributeType extends AbstractType
+{
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
         $builder
-                ->add('title')
-                ->add('type', ChoiceType::class, [
-                    "placeholder" => "Please select",
-                    "choices" => DynamicContentAttribute::$types
-                ])
-                ->add("hint", TextType::class, ["required" => false])
-                ->add("imageWidth", NumberType::class, ["required" => false])
-                ->add("imageHeight", NumberType::class, ["required" => false]);
+            ->add('title')
+            ->add('type', ChoiceType::class, [
+                "placeholder" => "Please select",
+                "choices" => DynamicContentAttribute::$types,
+            ])
+            ->add("hint", TextType::class, ["required" => false])
+            ->add("imageWidth", NumberType::class, ["required" => false])
+            ->add("imageHeight", NumberType::class, ["required" => false]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver)
+    {
         $resolver->setDefaults(array(
-            'data_class' => 'PN\ContentBundle\Entity\DynamicContentAttribute'
+            'data_class' => DynamicContentAttribute::class,
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix() {
-        return 'pn_bundle_cmsbundle_dynamiccontentattribute';
     }
 
 }

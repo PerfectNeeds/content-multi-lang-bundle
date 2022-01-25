@@ -2,6 +2,10 @@
 
 namespace PN\ContentBundle\Twig;
 
+use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\This;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use PN\ContentBundle\Entity\DynamicContentAttribute;
@@ -12,29 +16,39 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  * @author Peter Nassef <peter.nassef@gmail.com>
  * @version 1.0
  */
-class VarsRuntime implements RuntimeExtensionInterface {
+class VarsRuntime implements RuntimeExtensionInterface
+{
 
-    private $container;
     private $em;
     private $assetsManager;
+    private $router;
+    private $authorizationChecker;
 
-    public function __construct(ContainerInterface $container, TokenStorageInterface $tokenStorage, Packages $assetsManager) {
-        $this->container = $container;
-        $this->em = $container->get('doctrine')->getManager();
+    public function __construct(
+        TokenStorageInterface $tokenStorage,
+        Packages $assetsManager,
+        EntityManagerInterface $em,
+        RouterInterface $router,
+        AuthorizationCheckerInterface $authorizationChecker
+    ) {
+        $this->em = $em;
         $this->assetsManager = $assetsManager;
         $this->tokenStorage = $tokenStorage;
+        $this->router = $router;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
      * get DynamicContentAttribute by ID
      *
-     * @example {{ getDCA(11) }}
-     *
      * @param type $dynamicContentAttributeId
      * @return string
+     * @example {{ getDCA(11) }}
+     *
      */
-    public function getDynamicContentAttribute($dynamicContentAttributeId, $showEditBtn = true) {
-        $dynamicContentAttribute = $this->em->getRepository('PNContentBundle:DynamicContentAttribute')->find($dynamicContentAttributeId);
+    public function getDynamicContentAttribute($dynamicContentAttributeId, $showEditBtn = true)
+    {
+        $dynamicContentAttribute = $this->em->getRepository(DynamicContentAttribute::class)->find($dynamicContentAttributeId);
         if (!$dynamicContentAttribute) {
             return "";
         }
@@ -42,55 +56,61 @@ class VarsRuntime implements RuntimeExtensionInterface {
             return $this->assetsManager->getUrl($dynamicContentAttribute->getImage()->getAssetPath());
         } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_DOCUMENT and $dynamicContentAttribute->getDocument() != null) {
             $params = ["document" => $dynamicContentAttribute->getDocument()->getId()];
-            return $this->container->get("router")->generate("download") . "?d=" . str_replace('"', "'", json_encode($params));
+
+            return $this->router->generate("download")."?d=".str_replace('"', "'",
+                    json_encode($params));
         } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_HTML) {
             return $dynamicContentAttribute->getValue();
         }
 
         $editBtn = "";
-        if ($showEditBtn == true and in_array($dynamicContentAttribute->getType(), [DynamicContentAttribute::TYPE_TEXT, DynamicContentAttribute::TYPE_LONGTEXT])) {
+        if ($showEditBtn == true and in_array($dynamicContentAttribute->getType(),
+                [DynamicContentAttribute::TYPE_TEXT, DynamicContentAttribute::TYPE_LONGTEXT])) {
             $editBtn = $this->showEditBtn($dynamicContentAttribute->getId());
         }
 
-        return nl2br($dynamicContentAttribute->getValue()) . $editBtn;
+        return nl2br($dynamicContentAttribute->getValue()).$editBtn;
     }
 
     /**
      * edit DynamicContentAttribute by ID
      *
-     * @example {{ editDCA(11) }}
-     *
      * @param type $dynamicContentAttributeId
      * @return string
+     * @example {{ editDCA(11) }}
+     *
      */
-    public function editDynamicContentAttribute($dynamicContentAttributeId) {
+    public function editDynamicContentAttribute($dynamicContentAttributeId)
+    {
         return $this->showEditBtn($dynamicContentAttributeId);
     }
 
-    private function isGranted($attributes) {
-        if (!$this->container->has('security.authorization_checker')) {
-            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
-        }
+    private function isGranted($attributes)
+    {
         if ($this->tokenStorage->getToken() == null) {
             return false;
         }
 
-        return $this->container->get('security.authorization_checker')->isGranted($attributes, null);
+        return $this->authorizationChecker->isGranted($attributes);
     }
 
-    private function showEditBtn($dynamicContentAttributeId) {
+    private function showEditBtn($dynamicContentAttributeId)
+    {
         if ($this->isGranted("ROLE_ADMIN") == false) {
             return '';
         }
 
-        $url = $this->container->get("router")->generate("dynamic_content_attribute_edit", ['id' => $dynamicContentAttributeId]);
+        $url = $this->router->generate("dynamic_content_attribute_edit",
+            ['id' => $dynamicContentAttributeId]);
 
-        return ' <a href="' . $url . '" target="popup" onclick="window.open(\'' . $url . '\',\'popup\',\'width=600,height=600\'); return false;" title="Edit"><i class="fa fa-pencil"></i></a>';
+        return ' <a href="'.$url.'" target="popup" onclick="window.open(\''.$url.'\',\'popup\',\'width=600,height=600\'); return false;" title="Edit"><i class="fa fa-pencil"></i></a>';
     }
 
-    public function openGalleryBtn($postId) {
-        $url = $this->container->get("router")->generate("post_images_popup", ['id' => $postId]);
-        return '<a href="' . $url . '" target="popup" onclick="window.open(\'' . $url . '\',\'popup\',\'width=600,height=600\'); return false;" class="btn btn-default">Open Gallery</a>';
+    public function openGalleryBtn($postId)
+    {
+        $url = $this->router->generate("post_images_popup", ['id' => $postId]);
+
+        return '<a href="'.$url.'" target="popup" onclick="window.open(\''.$url.'\',\'popup\',\'width=600,height=600\'); return false;" class="btn btn-default">Open Gallery</a>';
     }
 
 }

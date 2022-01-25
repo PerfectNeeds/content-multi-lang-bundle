@@ -3,7 +3,7 @@
 namespace PN\ContentBundle\Entity\Translation;
 
 use Doctrine\ORM\Mapping as ORM;
-use Arxy\EntityTranslationsBundle\Model\EditableTranslation;
+use PN\LocaleBundle\Model\EditableTranslation;
 use PN\LocaleBundle\Model\TranslationEntity;
 
 /**
@@ -14,7 +14,7 @@ class PostTranslation extends TranslationEntity implements EditableTranslation {
     /**
      * @var array
      *
-     * @ORM\Column(name="content", type="json_array")
+     * @ORM\Column(name="content", type="json")
      */
     protected $content = [
         'brief' => '',

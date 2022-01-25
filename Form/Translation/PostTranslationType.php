@@ -2,6 +2,7 @@
 
 namespace PN\ContentBundle\Form\Translation;
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -13,13 +14,10 @@ class PostTranslationType extends AbstractType {
 
     protected $postTranslationClass;
 
-    public function __construct(ContainerInterface $container) {
-        $this->postTranslationClass = $container->getParameter("pn_content_post_translation_class");
+    public function __construct(ParameterBagInterface $parameterBag) {
+        $this->postTranslationClass = $parameterBag->get("pn_content_post_translation_class");
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $attributes = $options['attributes'];
         $this->createForm($builder, $attributes);
@@ -58,21 +56,11 @@ class PostTranslationType extends AbstractType {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver) {
         $resolver->setDefaults(array(
             'data_class' => $this->postTranslationClass,
             "attributes" => null
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix() {
-        return 'pn_bundle_cmsbundle_blogger';
     }
 
 }

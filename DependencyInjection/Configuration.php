@@ -10,26 +10,24 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/configuration.html}
  */
-class Configuration implements ConfigurationInterface {
+class Configuration implements ConfigurationInterface
+{
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfigTreeBuilder() {
+    public function getConfigTreeBuilder(): TreeBuilder
+    {
         $treeBuilder = new TreeBuilder('pn_content');
         $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
-                ->children()
-                ->scalarNode('post_class')
-                ->isRequired()
-                ->cannotBeEmpty()
-                ->end()
-                ->scalarNode('post_translation_class')
-                ->isRequired()
-                ->cannotBeEmpty()
-                ->end()
-        ;
+            ->children()
+            ->scalarNode('post_class')
+            ->isRequired()
+            ->cannotBeEmpty()
+            ->end()
+            ->scalarNode('post_translation_class')
+            ->isRequired()
+            ->cannotBeEmpty()
+            ->end();
 
         return $treeBuilder;
     }

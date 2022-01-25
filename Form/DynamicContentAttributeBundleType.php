@@ -2,36 +2,39 @@
 
 namespace PN\ContentBundle\Form;
 
+use Doctrine\ORM\EntityManagerInterface;
+use PN\LocaleBundle\Guesser\GuesserLoader;
+use PN\LocaleBundle\Model\Language;
+use PN\LocaleBundle\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use PN\ContentBundle\Entity\DynamicContentAttribute;
 use Symfony\Component\Validator\Constraints\Length;
 
-class DynamicContentAttributeBundleType extends AbstractType {
+class DynamicContentAttributeBundleType extends AbstractType
+{
 
-    protected $em;
-    protected $container;
+    private $em;
+    private $translator;
 
-    public function __construct(ContainerInterface $container) {
-        $this->container = $container;
-        $this->em = $container->get("doctrine")->getManager();
+    public function __construct(EntityManagerInterface $em, Translator $translator)
+    {
+        $this->translator = $translator;
+        $this->em = $em;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options) {
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
         $data = $options["data"];
 
-        $languages = $this->em->getRepository('PNLocaleBundle:Language')->findAll();
+        $languages = $this->em->getRepository(Language::class)->findAll();
         foreach ($data as $attribute) {
-            $lable = "" . $attribute->getTitle() . " #" . $attribute->getId();
+            $lable = "".$attribute->getTitle()." #".$attribute->getId();
             $attr = ["placeholder" => $attribute->getTypeName()];
             $constraints = [];
             $inputValue = $attribute->getValue();
@@ -62,35 +65,39 @@ class DynamicContentAttributeBundleType extends AbstractType {
                     break;
             }
             if ($inputType !== null) {
-                $builder->add($attribute->getId(), $inputType, ["label" => $lable, "constraints" => $constraints, 'data' => $inputValue, "required" => false, "attr" => $attr, "data_class" => null]);
-                if (!in_array($attribute->getType(), [DynamicContentAttribute::TYPE_IMAGE, DynamicContentAttribute::TYPE_DOCUMENT])) {
+                $builder->add($attribute->getId(), $inputType, [
+                    "label" => $lable,
+                    "constraints" => $constraints,
+                    'data' => $inputValue,
+                    "required" => false,
+                    "attr" => $attr,
+                    "data_class" => null,
+                ]);
+                if (!in_array($attribute->getType(),
+                    [DynamicContentAttribute::TYPE_IMAGE, DynamicContentAttribute::TYPE_DOCUMENT])) {
                     foreach ($languages as $language) {
-                        $translation = $this->container->get('arxy_entity_translations.translator')->getTranslation($attribute, $language->getLocale());
+                        $translation = $this->translator->getTranslation($attribute, $language->getLocale());
                         $translatedValue = null;
                         if ($translation) {
                             $translatedValue = $translation->getValue();
                         }
-                        $builder->add($attribute->getId() . "_" . $language->getLocale(), $inputType, ["label" => $lable . " (" . $language->getTitle() . ")", 'data' => $translatedValue, "required" => false, "attr" => $attr, "data_class" => null]);
+                        $builder->add($attribute->getId()."_".$language->getLocale(), $inputType, [
+                            "label" => $lable." (".$language->getTitle().")",
+                            'data' => $translatedValue,
+                            "required" => false,
+                            "attr" => $attr,
+                            "data_class" => null,
+                        ]);
                     }
                 }
             }
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver) {
+    public function configureOptions(OptionsResolver $resolver)
+    {
         $resolver->setDefaults(array(
-            'data_class' => null
+            'data_class' => null,
         ));
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix() {
-        return 'pn_bundle_cmsbundle_dynamiccontentattribute_eav';
-    }
-
 }

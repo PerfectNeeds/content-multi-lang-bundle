@@ -16,9 +16,6 @@ class PNContentExtension extends Extension {
 
     private $alias = "pn_content";
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(array $configs, ContainerBuilder $container) {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);

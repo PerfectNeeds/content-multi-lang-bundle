@@ -4,7 +4,7 @@ namespace PN\ContentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Arxy\EntityTranslationsBundle\Model\Translatable;
+use PN\LocaleBundle\Model\Translatable;
 use PN\LocaleBundle\Model\LocaleTrait;
 
 /**

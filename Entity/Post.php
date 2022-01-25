@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Post {
 
     /**
-     * @ORM\Column(name="content", type="json_array")
+     * @ORM\Column(name="content", type="json")
      */
     protected $content = [
         'brief' => '',
