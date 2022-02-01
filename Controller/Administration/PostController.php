@@ -213,7 +213,7 @@ class PostController extends AbstractController
         return $this->json(['error' => 0, 'message' => 'Deleted successfully']);
     }
 
-    private function validateImageDimension(Image $image, $imageSettingWithType): Response
+    private function validateImageDimension(Image $image, $imageSettingWithType): bool
     {
 
         if ($imageSettingWithType !== false and $imageSettingWithType->getValidateWidthAndHeight() == true) {
