@@ -40,8 +40,10 @@
         {% for notRadioButton in imageSetting.notRadioButton %}
             {% set checked ="" %}
             {% if post.images([notRadioButton.imageType.id])|length > 0 %}
-                {% for selectedImage in post.images([notRadioButton.imageType.id]) if  image.id == selectedImage.id %}
-                    {% set checked = "checked" %}
+                {% for selectedImage in post.images([notRadioButton.imageType.id]) %}
+                    {% if image.id == selectedImage.id %}
+                        {% set checked = "checked" %}
+                    {% endif %}
                 {% endfor %}
             {% endif %}
 

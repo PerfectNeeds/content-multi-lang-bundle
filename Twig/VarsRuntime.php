@@ -69,7 +69,12 @@ class VarsRuntime implements RuntimeExtensionInterface
             $editBtn = $this->showEditBtn($dynamicContentAttribute->getId());
         }
 
-        return nl2br($dynamicContentAttribute->getValue()).$editBtn;
+        $return = "";
+        if ($dynamicContentAttribute->getValue()) {
+            $return = nl2br($dynamicContentAttribute->getValue());
+        }
+
+        return $return.$editBtn;
     }
 
     /**
