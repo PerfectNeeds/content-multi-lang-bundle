@@ -4,7 +4,7 @@ namespace PN\ContentBundle\Form;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PN\LocaleBundle\Guesser\GuesserLoader;
-use PN\LocaleBundle\Model\Language;
+use PN\LocaleBundle\Entity\Language;
 use PN\LocaleBundle\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
