@@ -88,7 +88,7 @@ class PostController extends AbstractController
 
         $entity = $post->getRelationalEntity();
         $entityName = $commonFunctionService->getClassNameByObject($entity);
-        $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
+        $imageSetting = $em->getRepository(ImageSetting::class)->findByEntity($entityName);
 
         $entityTitle = null;
         if (method_exists($entity, "getTitle")) {
@@ -126,7 +126,7 @@ class PostController extends AbstractController
 
         $entity = $post->getRelationalEntity();
         $entityName = $commonFunctionService->getClassNameByObject($entity);
-        $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
+        $imageSetting = $em->getRepository(ImageSetting::class)->findByEntity($entityName);
         $returnData = [];
         $files = $request->files->get('files');
         foreach ($files as $file) {
@@ -264,7 +264,7 @@ class PostController extends AbstractController
 
         $entity = $post->getRelationalEntity();
         $entityName = $commonFunctionService->getClassNameByObject($entity);
-        $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
+        $imageSetting = $em->getRepository(ImageSetting::class)->findByEntity($entityName);
 
         $imageId = $request->request->get('image_id');
         $image = $em->getRepository($this->imageClass)->find($imageId);

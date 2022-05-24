@@ -174,7 +174,7 @@ class DynamicContentController extends AbstractController
         $eavForm->handleRequest($request);
 
         if ($eavForm->isSubmitted() && $eavForm->isValid()) {
-            $languages = $em->getRepository('PNLocaleBundle:Language')->findAll();
+            $languages = $em->getRepository(Languag::class)->findAll();
             $dynamicContentAttribute = new DynamicContentAttribute;
             foreach ($dynamicContentAttributes as $dynamicContentAttribute) {
                 $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $eavForm, $languages,
@@ -322,7 +322,7 @@ class DynamicContentController extends AbstractController
             return $this->redirectToRoute('dynamic_content_edit', array('id' => $dynamicContent->getId()));
         }
 
-        $dynamicContentAttributes = $em->getRepository('PNContentBundle:DynamicContentAttribute')->findBy(["dynamicContent" => $dynamicContent->getId()]);
+        $dynamicContentAttributes = $em->getRepository(DynamicContentAttribute::class)->findBy(["dynamicContent" => $dynamicContent->getId()]);
 
         return $this->render('@PNContent/Administration/DynamicContent/edit.html.twig', array(
             'dynamicContent' => $dynamicContent,
@@ -350,8 +350,8 @@ class DynamicContentController extends AbstractController
         $search->string = $srch['value'];
         $search->ordr = $ordr[0];
 
-        $count = $em->getRepository('PNContentBundle:DynamicContent')->filter($search, true);
-        $entities = $em->getRepository('PNContentBundle:DynamicContent')->filter($search, false, $start, $length);
+        $count = $em->getRepository(DynamicContent::class)->filter($search, true);
+        $entities = $em->getRepository(DynamicContent::class)->filter($search, false, $start, $length);
 
         return $this->render("@PNContent/Administration/DynamicContent/datatable.json.twig", array(
                 "recordsTotal" => $count,
