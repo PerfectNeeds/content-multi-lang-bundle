@@ -109,13 +109,12 @@
         $(document).ready(function () {
             showImageimageDimensionsInputes();
 
-            $("#pn_bundle_cmsbundle_dynamiccontentattribute_type").change(function () {
+            $("select[name*='[type]']").change(function () {
                 showImageimageDimensionsInputes();
             });
         });
         function showImageimageDimensionsInputes() {
-            var selected = $("#pn_bundle_cmsbundle_dynamiccontentattribute_type").find("option:selected");
-            console.log(selected);
+            var selected = $("select[name*='[type]']").find("option:selected");
             if (selected.val() == "{{ constant('\\PN\\ContentBundle\\Entity\\DynamicContentAttribute::TYPE_IMAGE') }}") {
                 $("#imageDimensions").removeClass("hidden");
             } else {
