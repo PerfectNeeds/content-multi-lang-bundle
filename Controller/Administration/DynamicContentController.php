@@ -174,7 +174,7 @@ class DynamicContentController extends AbstractController
         $eavForm->handleRequest($request);
 
         if ($eavForm->isSubmitted() && $eavForm->isValid()) {
-            $languages = $em->getRepository(Languag::class)->findAll();
+            $languages = $em->getRepository(Language::class)->findAll();
             $dynamicContentAttribute = new DynamicContentAttribute;
             foreach ($dynamicContentAttributes as $dynamicContentAttribute) {
                 $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $eavForm, $languages,
