@@ -2,6 +2,7 @@
 
 namespace PN\ContentBundle\Controller\Administration;
 
+use PN\ContentBundle\Service\PostService;
 use PN\MediaBundle\Entity\Image;
 use PN\ServiceBundle\Service\CommonFunctionService;
 use PN\ServiceBundle\Service\ContainerParameterService;
@@ -44,7 +45,7 @@ class PostController extends Controller
         }
 
 
-        $entity = $post->getRelationalEntity();
+        $entity = $this->get(PostService::class)->getRelationalEntity($post);
         $entityName = $this->get(CommonFunctionService::class)->getClassNameByObject($entity);
         $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
 
@@ -77,7 +78,7 @@ class PostController extends Controller
         }
 
 
-        $entity = $post->getRelationalEntity();
+        $entity = $this->get(PostService::class)->getRelationalEntity($post);
         $entityName = $this->get(CommonFunctionService::class)->getClassNameByObject($entity);
         $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
 
@@ -114,7 +115,7 @@ class PostController extends Controller
             return new JsonResponse($return);
         }
 
-        $entity = $post->getRelationalEntity();
+        $entity = $this->get(PostService::class)->getRelationalEntity($post);
         $entityName = $this->get(CommonFunctionService::class)->getClassNameByObject($entity);
         $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
         $returnData = [];
@@ -255,7 +256,7 @@ class PostController extends Controller
             $imageType = $type;
         }
 
-        $entity = $post->getRelationalEntity();
+        $entity = $this->get(PostService::class)->getRelationalEntity($post);
         $entityName = $this->get(CommonFunctionService::class)->getClassNameByObject($entity);
         $imageSetting = $em->getRepository('PNMediaBundle:ImageSetting')->findByEntity($entityName);
 

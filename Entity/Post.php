@@ -7,7 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\MappedSuperclass
  */
-class Post {
+class Post
+{
 
     /**
      * @ORM\Column(name="content", type="json_array")
@@ -26,40 +27,20 @@ class Post {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->images = new \Doctrine\Common\Collections\ArrayCollection();
         $this->translations = new \Doctrine\Common\Collections\ArrayCollection();
     }
-
-    public function getRelationalEntity() {
-        $excludeMethods = ['id', 'content', 'images', 'translations', "currentTranslation", "__initializer__", "__isInitialized__", "__cloner__"];
-
-        $allObjects = get_object_vars($this);
-        foreach ($allObjects as $objectName => $objectValue) {
-            if (in_array($objectName, $excludeMethods)) {
-                continue;
-            }
-            if ($objectValue != NULL) {
-                return $objectValue;
-            }
-        }
-        return NULL;
-    }
-
-    public function getRelationalEntityId() {
-        $relationalEntity = $this->getRelationalEntity();
-        if ($relationalEntity !== null) {
-            return $relationalEntity->getId();
-        }
-        return NULL;
-    }
+    
 
     /**
      * Get Main Image
      *
      * @return \PN\MediaBundle\Entity\Image
      */
-    public function getMainImage() {
+    public function getMainImage()
+    {
         return $this->getImages(array(\PN\MediaBundle\Entity\Image::TYPE_MAIN))->first();
     }
 
@@ -68,7 +49,8 @@ class Post {
      *
      * @return \PN\MediaBundle\Entity\Image
      */
-    public function getImageByType($type) {
+    public function getImageByType($type)
+    {
         return $this->getImages(array($type))->first();
     }
 
@@ -77,11 +59,12 @@ class Post {
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getImages($types = null) {
+    public function getImages($types = null)
+    {
         if ($types) {
-            return $this->images->filter(function(\PN\MediaBundle\Entity\Image $image) use ($types) {
-                        return in_array($image->getImageType(), $types);
-                    });
+            return $this->images->filter(function (\PN\MediaBundle\Entity\Image $image) use ($types) {
+                return in_array($image->getImageType(), $types);
+            });
         } else {
             return $this->images;
         }
@@ -94,7 +77,8 @@ class Post {
      *
      * @return Post
      */
-    public function setContent($content) {
+    public function setContent($content)
+    {
         $this->content = $content;
 
         return $this;
@@ -105,7 +89,8 @@ class Post {
      *
      * @return array
      */
-    public function getContent() {
+    public function getContent()
+    {
         return !$this->currentTranslation ? $this->content : $this->currentTranslation->getContent();
     }
 
@@ -116,7 +101,8 @@ class Post {
      *
      * @return Post
      */
-    public function addImage(\PN\MediaBundle\Entity\Image $image) {
+    public function addImage(\PN\MediaBundle\Entity\Image $image)
+    {
         $this->images[] = $image;
 
         return $this;
@@ -127,7 +113,8 @@ class Post {
      *
      * @param \PN\MediaBundle\Entity\Image $image
      */
-    public function removeImage(\PN\MediaBundle\Entity\Image $image) {
+    public function removeImage(\PN\MediaBundle\Entity\Image $image)
+    {
         $this->images->removeElement($image);
     }
 
