@@ -19,3 +19,4 @@ services:
 
   PN\ContentBundle\Service\:
     resource: '../../Service/*'
+    public: true
