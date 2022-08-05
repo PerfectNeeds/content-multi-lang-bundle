@@ -40,6 +40,16 @@ class PostService
         return null;
     }
 
+    public function getRelationalEntityId($post)
+    {
+        $entity = $this->getRelationalEntity($post);
+        if (is_object($post)) {
+            return $post->getId();
+        }
+
+        return null;
+    }
+
     private function getEntitiesWithPostObject()
     {
         $entities = [];
