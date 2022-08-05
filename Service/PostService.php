@@ -43,7 +43,7 @@ class PostService
     public function getRelationalEntityId($post)
     {
         $entity = $this->getRelationalEntity($post);
-        if (is_object($post)) {
+        if (is_object($entity)) {
             return $post->getId();
         }
 
