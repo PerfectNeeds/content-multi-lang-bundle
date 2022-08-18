@@ -3,6 +3,7 @@
 namespace PN\ContentBundle\Controller\Administration;
 
 use Doctrine\ORM\EntityManagerInterface;
+use PN\ContentBundle\Service\PostService;
 use PN\MediaBundle\Entity\Image;
 use PN\MediaBundle\Entity\ImageSetting;
 use PN\MediaBundle\Service\UploadImageService;
@@ -41,7 +42,8 @@ class PostController extends AbstractController
     public function imagesAction(
         $id,
         CommonFunctionService $commonFunctionService,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        PostService $postService
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_IMAGE_GALLERY');
 
@@ -51,7 +53,7 @@ class PostController extends AbstractController
         }
 
 
-        $entity = $post->getRelationalEntity();
+        $entity = $postService->getRelationalEntity($post);
         $entityName = $commonFunctionService->getClassNameByObject($entity);
         $imageSetting = $em->getRepository(ImageSetting::class)->findByEntity($entityName);
 
@@ -76,7 +78,8 @@ class PostController extends AbstractController
     public function imagesPopupAction(
         $id,
         EntityManagerInterface $em,
-        CommonFunctionService $commonFunctionService
+        CommonFunctionService $commonFunctionService,
+        PostService $postService
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_IMAGE_GALLERY');
 
@@ -86,7 +89,7 @@ class PostController extends AbstractController
         }
 
 
-        $entity = $post->getRelationalEntity();
+        $entity = $postService->getRelationalEntity($post);
         $entityName = $commonFunctionService->getClassNameByObject($entity);
         $imageSetting = $em->getRepository(ImageSetting::class)->findByEntity($entityName);
 
@@ -113,7 +116,8 @@ class PostController extends AbstractController
         $id,
         EntityManagerInterface $em,
         CommonFunctionService $commonFunctionService,
-        UploadImageService $uploadImageService
+        UploadImageService $uploadImageService,
+        PostService $postService
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_IMAGE_GALLERY');
 
@@ -124,7 +128,7 @@ class PostController extends AbstractController
             return $this->json($return);
         }
 
-        $entity = $post->getRelationalEntity();
+        $entity = $postService->getRelationalEntity($post);
         $entityName = $commonFunctionService->getClassNameByObject($entity);
         $imageSetting = $em->getRepository(ImageSetting::class)->findByEntity($entityName);
         $returnData = [];
@@ -244,7 +248,8 @@ class PostController extends AbstractController
         $post,
         EntityManagerInterface $em,
         CommonFunctionService $commonFunctionService,
-        UploadImageService $uploadImageService
+        UploadImageService $uploadImageService,
+        PostService $postService
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_IMAGE_GALLERY');
 
@@ -262,7 +267,7 @@ class PostController extends AbstractController
             $imageType = $type;
         }
 
-        $entity = $post->getRelationalEntity();
+        $entity = $postService->getRelationalEntity($post);
         $entityName = $commonFunctionService->getClassNameByObject($entity);
         $imageSetting = $em->getRepository(ImageSetting::class)->findByEntity($entityName);
 

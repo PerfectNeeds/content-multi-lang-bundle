@@ -25,3 +25,8 @@ services:
   PN\ContentBundle\Repository\:
     resource: '../../Repository/*'
     tags: [ 'doctrine.repository_service' ]
+
+  PN\ContentBundle\Service\:
+    resource: '../../Service/*'
+    public: true
+
