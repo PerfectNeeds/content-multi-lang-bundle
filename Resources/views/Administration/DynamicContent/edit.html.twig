@@ -107,13 +107,13 @@
     <script type="text/javascript" src="{{ asset('admin/js/plugins/forms/styling/uniform.min.js') }}"></script>
     <script>
         $(document).ready(function () {
-            showImageimageDimensionsInputes();
+            showImageDimensionsInputes();
 
             $("#pn_bundle_cmsbundle_dynamiccontentattribute_type").change(function () {
-                showImageimageDimensionsInputes();
+                showImageDimensionsInputes();
             });
         });
-        function showImageimageDimensionsInputes() {
+        function showImageDimensionsInputes() {
             var selected = $("#pn_bundle_cmsbundle_dynamiccontentattribute_type").find("option:selected");
             console.log(selected);
             if (selected.val() == "{{ constant('\\PN\\ContentBundle\\Entity\\DynamicContentAttribute::TYPE_IMAGE') }}") {
