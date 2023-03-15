@@ -2,38 +2,39 @@
 
 namespace PN\ContentBundle\Controller\Administration;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Form;
 use PN\ContentBundle\Entity\DynamicContent;
-use PN\ContentBundle\Form\DynamicContentType;
 use PN\ContentBundle\Entity\DynamicContentAttribute;
 use PN\ContentBundle\Entity\Translation\DynamicContentAttributeTranslation;
-use PN\ContentBundle\Form\DynamicContentAttributeType;
 use PN\ContentBundle\Form\DynamicContentAttributeBundleType;
+use PN\ContentBundle\Form\DynamicContentAttributeType;
+use PN\ContentBundle\Form\DynamicContentType;
+use PN\ContentBundle\Service\DynamicContentService;
 use PN\MediaBundle\Entity\Image;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Dynamiccontent controller.
- *
  * @Route("dynamic-content")
  */
-class DynamicContentController extends Controller {
+class DynamicContentController extends Controller
+{
 
     /**
      * Lists all dynamicContent entities.
      *
      * @Route("/", name="dynamic_content_index", methods={"GET"})
      */
-    public function indexAction() {
+    public function indexAction()
+    {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $em = $this->getDoctrine()->getManager();
 
         $dynamicContents = $em->getRepository('PNContentBundle:DynamicContent')->findAll();
 
         return $this->render('@PNContent/Administration/DynamicContent/index.html.twig', array(
-                    'dynamicContents' => $dynamicContents,
+            'dynamicContents' => $dynamicContents,
         ));
     }
 
@@ -42,7 +43,8 @@ class DynamicContentController extends Controller {
      *
      * @Route("/new", name="dynamic_content_new", methods={"GET", "POST"})
      */
-    public function newAction(Request $request) {
+    public function newAction(Request $request)
+    {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $dynamicContent = new DynamicContent();
         $form = $this->createForm(DynamicContentType::class, $dynamicContent);
@@ -57,8 +59,8 @@ class DynamicContentController extends Controller {
         }
 
         return $this->render('@PNContent/Administration/DynamicContent/new.html.twig', array(
-                    'dynamicContent' => $dynamicContent,
-                    'form' => $form->createView(),
+            'dynamicContent' => $dynamicContent,
+            'form' => $form->createView(),
         ));
     }
 
@@ -67,22 +69,25 @@ class DynamicContentController extends Controller {
      *
      * @Route("/{id}/edit", name="dynamic_content_edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, DynamicContent $dynamicContent) {
+    public function editAction(Request $request, DynamicContent $dynamicContent)
+    {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $editForm = $this->createForm(DynamicContentType::class, $dynamicContent, [
-            'action' => $this->generateUrl('dynamic_content_edit', ["id" => $dynamicContent->getId()])
+            'action' => $this->generateUrl('dynamic_content_edit', ["id" => $dynamicContent->getId()]),
         ]);
         $editForm->handleRequest($request);
 
         $dynamicContentAttr = new DynamicContentAttribute;
         $attrForm = $this->createForm(DynamicContentAttributeType::class, $dynamicContentAttr, [
-            'action' => $this->generateUrl('dynamic_content_attribute_new', ["id" => $dynamicContent->getId()])
+            'action' => $this->generateUrl('dynamic_content_attribute_new', ["id" => $dynamicContent->getId()]),
         ]);
         $attrForm->handleRequest($request);
 
-        $eavForm = $this->createForm(DynamicContentAttributeBundleType::class, $dynamicContent->getDynamicContentAttributes(), [
-            'action' => $this->generateUrl('dynamic_content_attribute_data_edit', ["id" => $dynamicContent->getId()])
-        ]);
+        $eavForm = $this->createForm(DynamicContentAttributeBundleType::class,
+            $dynamicContent->getDynamicContentAttributes(), [
+                'action' => $this->generateUrl('dynamic_content_attribute_data_edit',
+                    ["id" => $dynamicContent->getId()]),
+            ]);
         $eavForm->handleRequest($request);
 
         $em = $this->getDoctrine()->getManager();
@@ -94,11 +99,11 @@ class DynamicContentController extends Controller {
         $dynamicContentAttributes = $em->getRepository('PNContentBundle:DynamicContentAttribute')->findBy(["dynamicContent" => $dynamicContent->getId()]);
 
         return $this->render('@PNContent/Administration/DynamicContent/edit.html.twig', array(
-                    'dynamicContent' => $dynamicContent,
-                    'dynamicContentAttributes' => $dynamicContentAttributes,
-                    'edit_form' => $editForm->createView(),
-                    'attr_form' => $attrForm->createView(),
-                    'eav_form' => $eavForm->createView(),
+            'dynamicContent' => $dynamicContent,
+            'dynamicContentAttributes' => $dynamicContentAttributes,
+            'edit_form' => $editForm->createView(),
+            'attr_form' => $attrForm->createView(),
+            'eav_form' => $eavForm->createView(),
         ));
     }
 
@@ -107,7 +112,11 @@ class DynamicContentController extends Controller {
      *
      * @Route("/{id}/edit-attribute", name="dynamic_content_attribute_edit", methods={"GET", "POST"})
      */
-    public function editAttributeAction(Request $request, DynamicContentAttribute $dynamicContentAttribute) {
+    public function editAttributeAction(
+        Request $request,
+        DynamicContentService $dynamicContentService,
+        DynamicContentAttribute $dynamicContentAttribute
+    ) {
         $this->denyAccessUnlessGranted("ROLE_ADMIN");
         $editForm = $this->createForm(DynamicContentAttributeBundleType::class, [$dynamicContentAttribute]);
         $editForm->handleRequest($request);
@@ -116,15 +125,18 @@ class DynamicContentController extends Controller {
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $languages = $em->getRepository('PNLocaleBundle:Language')->findAll();
 
-            $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $editForm, $languages);
+            $this->persistDynamicContentAttribute($dynamicContentService, $dynamicContentAttribute, $request, $editForm,
+                $languages);
             $em->flush();
 
-            return $this->redirectToRoute('dynamic_content_attribute_edit', array('id' => $dynamicContentAttribute->getId()));
+
+            return $this->redirectToRoute('dynamic_content_attribute_edit',
+                array('id' => $dynamicContentAttribute->getId()));
         }
 
         return $this->render('@PNContent/Administration/DynamicContent/editAttribute.html.twig', array(
-                    'dynamicContentAttribute' => $dynamicContentAttribute,
-                    'edit_form' => $editForm->createView(),
+            'dynamicContentAttribute' => $dynamicContentAttribute,
+            'edit_form' => $editForm->createView(),
         ));
     }
 
@@ -133,29 +145,34 @@ class DynamicContentController extends Controller {
      *
      * @Route("/{id}/data/edit", name="dynamic_content_attribute_data_edit", methods={"GET", "POST"})
      */
-    public function editAttributeDataAction(Request $request, DynamicContent $dynamicContent) {
+    public function editAttributeDataAction(
+        Request $request,
+        DynamicContentService $dynamicContentService,
+        DynamicContent $dynamicContent
+    ) {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $editForm = $this->createForm(DynamicContentType::class, $dynamicContent, [
-            'action' => $this->generateUrl('dynamic_content_edit', ["id" => $dynamicContent->getId()])
+            'action' => $this->generateUrl('dynamic_content_edit', ["id" => $dynamicContent->getId()]),
         ]);
 
         $dynamicContentAttr = new DynamicContentAttribute;
         $attrForm = $this->createForm(DynamicContentAttributeType::class, $dynamicContentAttr, [
-            'action' => $this->generateUrl('dynamic_content_attribute_new', ["id" => $dynamicContent->getId()])
+            'action' => $this->generateUrl('dynamic_content_attribute_new', ["id" => $dynamicContent->getId()]),
         ]);
 
         $em = $this->getDoctrine()->getManager();
         $dynamicContentAttributes = $em->getRepository('PNContentBundle:DynamicContentAttribute')->findBy(["dynamicContent" => $dynamicContent->getId()]);
         $eavForm = $this->createForm(DynamicContentAttributeBundleType::class, $dynamicContentAttributes, [
-            'action' => $this->generateUrl('dynamic_content_attribute_data_edit', ["id" => $dynamicContent->getId()])
+            'action' => $this->generateUrl('dynamic_content_attribute_data_edit', ["id" => $dynamicContent->getId()]),
         ]);
         $eavForm->handleRequest($request);
 
         if ($eavForm->isSubmitted() && $eavForm->isValid()) {
             $languages = $em->getRepository('PNLocaleBundle:Language')->findAll();
-            $dynamicContentAttribute = new DynamicContentAttribute;
+            $dynamicContentAttribute = new DynamicContentAttribute();
             foreach ($dynamicContentAttributes as $dynamicContentAttribute) {
-                $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $eavForm, $languages);
+                $this->persistDynamicContentAttribute($dynamicContentService, $dynamicContentAttribute, $request,
+                    $eavForm, $languages);
             }
             $em->flush();
 
@@ -163,15 +180,21 @@ class DynamicContentController extends Controller {
         }
 
         return $this->render('@PNContent/Administration/DynamicContent/edit.html.twig', array(
-                    'dynamicContent' => $dynamicContent,
-                    'dynamicContentAttributes' => $dynamicContentAttributes,
-                    'edit_form' => $editForm->createView(),
-                    'attr_form' => $attrForm->createView(),
-                    'eav_form' => $eavForm->createView(),
+            'dynamicContent' => $dynamicContent,
+            'dynamicContentAttributes' => $dynamicContentAttributes,
+            'edit_form' => $editForm->createView(),
+            'attr_form' => $attrForm->createView(),
+            'eav_form' => $eavForm->createView(),
         ));
     }
 
-    private function persistDynamicContentAttribute(DynamicContentAttribute $dynamicContentAttribute, Request $request, Form $form, $languages) {
+    private function persistDynamicContentAttribute(
+        DynamicContentService $dynamicContentService,
+        DynamicContentAttribute $dynamicContentAttribute,
+        Request $request,
+        Form $form,
+        $languages
+    ) {
         $value = $form->get($dynamicContentAttribute->getId())->getData();
         if ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_IMAGE) {
             if ($value !== null) {
@@ -191,8 +214,9 @@ class DynamicContentController extends Controller {
             $dynamicContentAttribute->setImageWidth(null);
             $dynamicContentAttribute->setImageHeight(null);
             foreach ($languages as $language) {
-                $valueTranslated = $form->get($dynamicContentAttribute->getId() . "_" . $language->getLocale())->getData();
-                $dynamicContentAttributeTranslation = $this->get('vm5_entity_translations.translator')->getTranslation($dynamicContentAttribute, $language->getLocale());
+                $valueTranslated = $form->get($dynamicContentAttribute->getId()."_".$language->getLocale())->getData();
+                $dynamicContentAttributeTranslation = $this->get('vm5_entity_translations.translator')->getTranslation($dynamicContentAttribute,
+                    $language->getLocale());
                 if (!$dynamicContentAttributeTranslation) {
                     $dynamicContentAttributeTranslation = new DynamicContentAttributeTranslation();
                 }
@@ -202,9 +226,11 @@ class DynamicContentController extends Controller {
             }
         }
         $this->getDoctrine()->getManager()->persist($dynamicContentAttribute);
+        $dynamicContentService->removeDynamicContentValueFromCache($dynamicContentAttribute->getId());
     }
 
-    private function uploadImage(Request $request, DynamicContentAttribute $dynamicContentAttribute, $value) {
+    private function uploadImage(Request $request, DynamicContentAttribute $dynamicContentAttribute, $value)
+    {
         $validateImageDimensions = $this->validateImageDimensions($dynamicContentAttribute, $value);
         if ($validateImageDimensions == false) {
             return false;
@@ -214,7 +240,8 @@ class DynamicContentController extends Controller {
         $imageUploader->uploadSingleImage($dynamicContentAttribute, $value, 80, $request, Image::TYPE_MAIN);
     }
 
-    private function validateImageDimensions(DynamicContentAttribute $dynamicContentAttribute, $value) {
+    private function validateImageDimensions(DynamicContentAttribute $dynamicContentAttribute, $value)
+    {
         $width = $dynamicContentAttribute->getImageWidth();
         $height = $dynamicContentAttribute->getImageHeight();
         if ($width == null or $height == null) {
@@ -225,10 +252,12 @@ class DynamicContentController extends Controller {
 
         if ($width != null and $currentWidth != $width) {
             $this->addFlash("error", "This image dimensions are wrong, please upload one with the right dimensions");
+
             return false;
         }
         if ($height != null and $currentHeight != $height) {
             $this->addFlash("error", "This image dimensions are wrong, please upload one with the right dimensions");
+
             return false;
         }
 
@@ -240,7 +269,8 @@ class DynamicContentController extends Controller {
      *
      * @Route("/{id}", name="dynamic_content_delete", methods={"DELETE"})
      */
-    public function deleteAction(Request $request, DynamicContent $dynamicContent) {
+    public function deleteAction(Request $request, DynamicContent $dynamicContent)
+    {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $em = $this->getDoctrine()->getManager();
         $em->remove($dynamicContent);
@@ -254,21 +284,24 @@ class DynamicContentController extends Controller {
      *
      * @Route("/new-attribute/{id}", name="dynamic_content_attribute_new", methods={"POST"})
      */
-    public function newAttributeAction(Request $request, DynamicContent $dynamicContent) {
+    public function newAttributeAction(Request $request, DynamicContent $dynamicContent)
+    {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $editForm = $this->createForm(DynamicContentType::class, $dynamicContent, [
-            'action' => $this->generateUrl('dynamic_content_edit', ["id" => $dynamicContent->getId()])
+            'action' => $this->generateUrl('dynamic_content_edit', ["id" => $dynamicContent->getId()]),
         ]);
 
         $dynamicContentAttr = new DynamicContentAttribute;
         $attrForm = $this->createForm(DynamicContentAttributeType::class, $dynamicContentAttr, [
-            'action' => $this->generateUrl('dynamic_content_attribute_new', ["id" => $dynamicContent->getId()])
+            'action' => $this->generateUrl('dynamic_content_attribute_new', ["id" => $dynamicContent->getId()]),
         ]);
         $attrForm->handleRequest($request);
 
-        $eavForm = $this->createForm(DynamicContentAttributeBundleType::class, $dynamicContent->getDynamicContentAttributes(), [
-            'action' => $this->generateUrl('dynamic_content_attribute_data_edit', ["id" => $dynamicContent->getId()])
-        ]);
+        $eavForm = $this->createForm(DynamicContentAttributeBundleType::class,
+            $dynamicContent->getDynamicContentAttributes(), [
+                'action' => $this->generateUrl('dynamic_content_attribute_data_edit',
+                    ["id" => $dynamicContent->getId()]),
+            ]);
 
         $em = $this->getDoctrine()->getManager();
         if ($attrForm->isSubmitted() && $attrForm->isValid()) {
@@ -277,17 +310,18 @@ class DynamicContentController extends Controller {
             $em->flush();
 
             $this->addFlash("success", "Successfully added");
+
             return $this->redirectToRoute('dynamic_content_edit', array('id' => $dynamicContent->getId()));
         }
 
         $dynamicContentAttributes = $em->getRepository('PNContentBundle:DynamicContentAttribute')->findBy(["dynamicContent" => $dynamicContent->getId()]);
 
         return $this->render('@PNContent/Administration/DynamicContent/edit.html.twig', array(
-                    'dynamicContent' => $dynamicContent,
-                    'dynamicContentAttributes' => $dynamicContentAttributes,
-                    'edit_form' => $editForm->createView(),
-                    'attr_form' => $attrForm->createView(),
-                    'eav_form' => $eavForm->createView(),
+            'dynamicContent' => $dynamicContent,
+            'dynamicContentAttributes' => $dynamicContentAttributes,
+            'edit_form' => $editForm->createView(),
+            'attr_form' => $attrForm->createView(),
+            'eav_form' => $eavForm->createView(),
         ));
     }
 
@@ -296,7 +330,8 @@ class DynamicContentController extends Controller {
      *
      * @Route("/data/table", defaults={"_format": "json"}, name="dynamic_content_datatable", methods={"GET"})
      */
-    public function dataTableAction(Request $request) {
+    public function dataTableAction(Request $request)
+    {
         $em = $this->getDoctrine()->getManager();
 
         $srch = $request->query->get("search");
@@ -309,14 +344,14 @@ class DynamicContentController extends Controller {
         $search->string = $srch['value'];
         $search->ordr = $ordr[0];
 
-        $count = $em->getRepository('PNContentBundle:DynamicContent')->filter($search, TRUE);
-        $entities = $em->getRepository('PNContentBundle:DynamicContent')->filter($search, FALSE, $start, $length);
+        $count = $em->getRepository('PNContentBundle:DynamicContent')->filter($search, true);
+        $entities = $em->getRepository('PNContentBundle:DynamicContent')->filter($search, false, $start, $length);
 
         return $this->render("@PNContent/Administration/DynamicContent/datatable.json.twig", array(
-                    "recordsTotal" => $count,
-                    "recordsFiltered" => $count,
-                    "entities" => $entities,
-                        )
+                "recordsTotal" => $count,
+                "recordsFiltered" => $count,
+                "entities" => $entities,
+            )
         );
     }
 
