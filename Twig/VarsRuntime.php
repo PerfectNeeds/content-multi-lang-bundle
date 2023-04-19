@@ -45,7 +45,7 @@ class VarsRuntime implements RuntimeExtensionInterface
      */
     public function editDynamicContentAttribute($dynamicContentAttributeId)
     {
-        return $this->dynamicContentService->showEditBtn($dynamicContentAttributeId, $showEditBtn);
+        return $this->dynamicContentService->showEditBtn($dynamicContentAttributeId);
     }
 
     public function openGalleryBtn($postId)
