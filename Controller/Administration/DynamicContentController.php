@@ -3,6 +3,7 @@
 namespace PN\ContentBundle\Controller\Administration;
 
 use Doctrine\ORM\EntityManagerInterface;
+use PN\ContentBundle\Service\DynamicContentService;
 use PN\LocaleBundle\Entity\Language;
 use PN\LocaleBundle\Translator;
 use PN\MediaBundle\Service\UploadDocumentService;
@@ -116,13 +117,15 @@ class DynamicContentController extends AbstractController
      * @Route("/{id}/edit-attribute", name="dynamic_content_attribute_edit", methods={"GET", "POST"})
      */
     public function editAttributeAction(
-        Request $request,
+        Request                 $request,
         DynamicContentAttribute $dynamicContentAttribute,
-        EntityManagerInterface $em,
-        UploadDocumentService $uploadDocumentService,
-        UploadImageService $uploadImageService,
-        Translator $translationService
-    ) {
+        EntityManagerInterface  $em,
+        UploadDocumentService   $uploadDocumentService,
+        UploadImageService      $uploadImageService,
+        DynamicContentService   $dynamicContentService,
+        Translator              $translationService
+    )
+    {
         $this->denyAccessUnlessGranted("ROLE_ADMIN");
         $editForm = $this->createForm(DynamicContentAttributeBundleType::class, [$dynamicContentAttribute]);
         $editForm->handleRequest($request);
@@ -130,7 +133,7 @@ class DynamicContentController extends AbstractController
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $languages = $em->getRepository(Language::class)->findAll();
 
-            $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $editForm, $languages,
+            $this->persistDynamicContentAttribute($dynamicContentService, $dynamicContentAttribute, $request, $editForm, $languages,
                 $uploadDocumentService, $uploadImageService, $translationService, $em);
             $em->flush();
 
@@ -150,13 +153,15 @@ class DynamicContentController extends AbstractController
      * @Route("/{id}/data/edit", name="dynamic_content_attribute_data_edit", methods={"GET", "POST"})
      */
     public function editAttributeDataAction(
-        Request $request,
-        DynamicContent $dynamicContent,
+        Request                $request,
+        DynamicContent         $dynamicContent,
         EntityManagerInterface $em,
-        UploadDocumentService $uploadDocumentService,
-        UploadImageService $uploadImageService,
-        Translator $translationService
-    ) {
+        UploadDocumentService  $uploadDocumentService,
+        UploadImageService     $uploadImageService,
+        DynamicContentService  $dynamicContentService,
+        Translator             $translationService
+    )
+    {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $editForm = $this->createForm(DynamicContentType::class, $dynamicContent, [
             'action' => $this->generateUrl('dynamic_content_edit', ["id" => $dynamicContent->getId()]),
@@ -177,7 +182,7 @@ class DynamicContentController extends AbstractController
             $languages = $em->getRepository(Language::class)->findAll();
             $dynamicContentAttribute = new DynamicContentAttribute;
             foreach ($dynamicContentAttributes as $dynamicContentAttribute) {
-                $this->persistDynamicContentAttribute($dynamicContentAttribute, $request, $eavForm, $languages,
+                $this->persistDynamicContentAttribute($dynamicContentService, $dynamicContentAttribute, $request, $eavForm, $languages,
                     $uploadDocumentService, $uploadImageService, $translationService, $em);
             }
             $em->flush();
@@ -195,15 +200,17 @@ class DynamicContentController extends AbstractController
     }
 
     private function persistDynamicContentAttribute(
+        DynamicContentService   $dynamicContentService,
         DynamicContentAttribute $dynamicContentAttribute,
-        Request $request,
-        Form $form,
-        $languages,
-        UploadDocumentService $uploadDocumentService,
-        UploadImageService $uploadImageService,
-        Translator $translationService,
-        EntityManagerInterface $em
-    ) {
+        Request                 $request,
+        Form                    $form,
+                                $languages,
+        UploadDocumentService   $uploadDocumentService,
+        UploadImageService      $uploadImageService,
+        Translator              $translationService,
+        EntityManagerInterface  $em
+    )
+    {
         $value = $form->get($dynamicContentAttribute->getId())->getData();
         if ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_IMAGE) {
             if ($value !== null) {
@@ -222,7 +229,7 @@ class DynamicContentController extends AbstractController
             $dynamicContentAttribute->setImageWidth(null);
             $dynamicContentAttribute->setImageHeight(null);
             foreach ($languages as $language) {
-                $valueTranslated = $form->get($dynamicContentAttribute->getId()."_".$language->getLocale())->getData();
+                $valueTranslated = $form->get($dynamicContentAttribute->getId() . "_" . $language->getLocale())->getData();
                 $dynamicContentAttributeTranslation = $translationService->getTranslation($dynamicContentAttribute,
                     $language->getLocale());
                 if (!$dynamicContentAttributeTranslation) {
@@ -234,14 +241,17 @@ class DynamicContentController extends AbstractController
             }
         }
         $em->persist($dynamicContentAttribute);
+        $dynamicContentService->removeDynamicContentValueFromCache($dynamicContentAttribute->getId());
+
     }
 
     private function uploadImage(
-        Request $request,
+        Request                 $request,
         DynamicContentAttribute $dynamicContentAttribute,
-        $value,
-        UploadImageService $uploadImageService
-    ) {
+                                $value,
+        UploadImageService      $uploadImageService
+    )
+    {
         $validateImageDimensions = $this->validateImageDimensions($dynamicContentAttribute, $value);
         if ($validateImageDimensions == false) {
             return false;
