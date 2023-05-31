@@ -11,16 +11,18 @@ use PN\LocaleBundle\Model\LocaleTrait;
  * @ORM\Table(name="dynamic_content_attribute")
  * @ORM\Entity()
  */
-class DynamicContentAttribute implements Translatable {
+class DynamicContentAttribute implements Translatable
+{
 
     use LocaleTrait;
 
-    CONST TYPE_TEXT = 1;
-    CONST TYPE_LONGTEXT = 2;
-    CONST TYPE_LINK = 3;
-    CONST TYPE_IMAGE = 4;
-    CONST TYPE_DOCUMENT = 5;
-    CONST TYPE_HTML = 6;
+    const TYPE_TEXT = 1;
+    const TYPE_LONGTEXT = 2;
+    const TYPE_LINK = 3;
+    const TYPE_IMAGE = 4;
+    const TYPE_DOCUMENT = 5;
+    const TYPE_HTML = 6;
+    const TYPE_NUMBER = 7;
 
     public static $types = [
         "Text (100 character)" => self::TYPE_TEXT,
@@ -28,6 +30,7 @@ class DynamicContentAttribute implements Translatable {
         "Link" => self::TYPE_LINK,
         "Image" => self::TYPE_IMAGE,
         "Document" => self::TYPE_DOCUMENT,
+        "Number" => self::TYPE_NUMBER,
         "HTML Tags" => self::TYPE_HTML,
     ];
 
@@ -99,16 +102,19 @@ class DynamicContentAttribute implements Translatable {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->image = new \Doctrine\Common\Collections\ArrayCollection();
         $this->translations = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-    public function __toString() {
-        return (string) $this->getValue();
+    public function __toString()
+    {
+        return (string)$this->getValue();
     }
 
-    public function getTypeName() {
+    public function getTypeName()
+    {
         return array_search($this->getType(), self::$types);
     }
 
@@ -117,7 +123,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return integer
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -128,7 +135,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return DynamicContentAttribute
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = $title;
 
         return $this;
@@ -139,7 +147,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return string
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
@@ -150,7 +159,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return DynamicContentAttribute
      */
-    public function setType($type) {
+    public function setType($type)
+    {
         $this->type = $type;
 
         return $this;
@@ -161,7 +171,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return integer
      */
-    public function getType() {
+    public function getType()
+    {
         return $this->type;
     }
 
@@ -172,7 +183,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return DynamicContentAttribute
      */
-    public function setHint($hint) {
+    public function setHint($hint)
+    {
         $this->hint = $hint;
 
         return $this;
@@ -183,7 +195,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return string
      */
-    public function getHint() {
+    public function getHint()
+    {
         return $this->hint;
     }
 
@@ -194,7 +207,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return DynamicContentAttribute
      */
-    public function setDynamicContent(\PN\ContentBundle\Entity\DynamicContent $dynamicContent = null) {
+    public function setDynamicContent(\PN\ContentBundle\Entity\DynamicContent $dynamicContent = null)
+    {
         $this->dynamicContent = $dynamicContent;
 
         return $this;
@@ -205,7 +219,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return \PN\ContentBundle\Entity\DynamicContent
      */
-    public function getDynamicContent() {
+    public function getDynamicContent()
+    {
         return $this->dynamicContent;
     }
 
@@ -216,7 +231,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return DynamicContentAttribute
      */
-    public function addImage(\PN\MediaBundle\Entity\Image $image) {
+    public function addImage(\PN\MediaBundle\Entity\Image $image)
+    {
         $this->image[] = $image;
 
         return $this;
@@ -227,7 +243,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @param \PN\MediaBundle\Entity\Image $image
      */
-    public function removeImage(\PN\MediaBundle\Entity\Image $image) {
+    public function removeImage(\PN\MediaBundle\Entity\Image $image)
+    {
         $this->image->removeElement($image);
     }
 
@@ -236,7 +253,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getImage() {
+    public function getImage()
+    {
         return $this->image->first();
     }
 
@@ -247,7 +265,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return DynamicContentAttribute
      */
-    public function addDocument(\PN\MediaBundle\Entity\Document $document) {
+    public function addDocument(\PN\MediaBundle\Entity\Document $document)
+    {
         $this->document[] = $document;
 
         return $this;
@@ -258,7 +277,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @param \PN\MediaBundle\Entity\Document $document
      */
-    public function removeDocument(\PN\MediaBundle\Entity\Document $document) {
+    public function removeDocument(\PN\MediaBundle\Entity\Document $document)
+    {
         $this->document->removeElement($document);
     }
 
@@ -267,7 +287,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getDocument() {
+    public function getDocument()
+    {
         return $this->document->first();
     }
 
@@ -278,7 +299,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return DynamicContentAttribute
      */
-    public function setValue($value) {
+    public function setValue($value)
+    {
         $this->value = $value;
 
         return $this;
@@ -289,7 +311,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return string
      */
-    public function getValue() {
+    public function getValue()
+    {
         return !$this->currentTranslation ? $this->value : $this->currentTranslation->getValue();
     }
 
@@ -299,7 +322,8 @@ class DynamicContentAttribute implements Translatable {
      * @param float $imageWidth
      * @return DynamicContentAttribute
      */
-    public function setImageWidth($imageWidth) {
+    public function setImageWidth($imageWidth)
+    {
         $this->imageWidth = $imageWidth;
 
         return $this;
@@ -310,7 +334,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return float
      */
-    public function getImageWidth() {
+    public function getImageWidth()
+    {
         return $this->imageWidth;
     }
 
@@ -320,7 +345,8 @@ class DynamicContentAttribute implements Translatable {
      * @param float $imageHeight
      * @return DynamicContentAttribute
      */
-    public function setImageHeight($imageHeight) {
+    public function setImageHeight($imageHeight)
+    {
         $this->imageHeight = $imageHeight;
 
         return $this;
@@ -331,7 +357,8 @@ class DynamicContentAttribute implements Translatable {
      *
      * @return float
      */
-    public function getImageHeight() {
+    public function getImageHeight()
+    {
         return $this->imageHeight;
     }
 

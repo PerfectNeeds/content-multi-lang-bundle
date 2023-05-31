@@ -10,6 +10,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -43,6 +44,9 @@ class DynamicContentAttributeBundleType extends AbstractType
                     $inputType = TextType::class;
                     $constraints = [new Length(["min" => 0, "max" => 100])];
                     $attr["maxlength"] = 100;
+                    break;
+                case DynamicContentAttribute::TYPE_NUMBER:
+                    $inputType = NumberType::class;
                     break;
                 case DynamicContentAttribute::TYPE_LONGTEXT:
                 case DynamicContentAttribute::TYPE_HTML:

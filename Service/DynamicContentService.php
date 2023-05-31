@@ -10,8 +10,8 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 class DynamicContentService
@@ -147,6 +147,11 @@ class DynamicContentService
                         json_encode($params)),
             ];
         } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_HTML) {
+            return [
+                "type" => $dynamicContentAttribute->getType(),
+                "value" => $dynamicContentAttribute->getValue(),
+            ];
+        } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_NUMBER) {
             return [
                 "type" => $dynamicContentAttribute->getType(),
                 "value" => $dynamicContentAttribute->getValue(),
