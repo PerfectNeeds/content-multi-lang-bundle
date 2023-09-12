@@ -292,7 +292,7 @@ class PostController extends AbstractController
             return $this->json(["error" => 1, 'message' => $message]);
         }
 
-        $maxFileSize = 2100000; //2MB
+        $maxFileSize = 2200000; //2MB
         if ($imageSettingWithType->getValidateSize() == true and $image->getSize() > $maxFileSize) {
             $message = sprintf("The image uploaded must be max %s", "2MB");
 
