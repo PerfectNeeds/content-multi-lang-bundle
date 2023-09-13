@@ -10,6 +10,13 @@
             <li><a href="{{ path('dashboard') }}"><i class="icon-home2 position-left"></i>Dashboard</a></li>
             <li class="active">{{ page_title }}</li>
         </ul>
+        <ul class="breadcrumb-elements">
+            <li>
+                <a href="{{ path('dynamic_content_delete_all_cache') }}">
+                    <i class="icon-database-remove position-left"></i> Delete Cache
+                </a>
+            </li>
+        </ul>
     </div>
 {% endblock %}
 {% block body %}

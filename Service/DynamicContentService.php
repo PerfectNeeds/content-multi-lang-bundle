@@ -127,6 +127,16 @@ class DynamicContentService
         $cache->delete($cacheKey);
     }
 
+    public function removeAllDynamicContentCache(): void
+    {
+        $cache = new FilesystemAdapter();
+        $dynamicContentAttributes = $this->em->getRepository(DynamicContentAttribute::class)->findAll();
+        foreach ($dynamicContentAttributes as $dynamicContentAttribute) {
+            $cacheKey = $this->getCacheName($dynamicContentAttribute->getId());
+            $cache->delete($cacheKey);
+        }
+    }
+
     private function getDynamicContentValue($dynamicContentAttributeId): array
     {
         $dynamicContentAttribute = $this->em->getRepository(DynamicContentAttribute::class)->find($dynamicContentAttributeId);

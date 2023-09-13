@@ -3,22 +3,23 @@
 namespace PN\ContentBundle\Controller\Administration;
 
 use Doctrine\ORM\EntityManagerInterface;
+use PN\ContentBundle\Entity\DynamicContent;
+use PN\ContentBundle\Entity\DynamicContentAttribute;
+use PN\ContentBundle\Entity\Translation\DynamicContentAttributeTranslation;
+use PN\ContentBundle\Form\DynamicContentAttributeBundleType;
+use PN\ContentBundle\Form\DynamicContentAttributeType;
+use PN\ContentBundle\Form\DynamicContentType;
 use PN\ContentBundle\Service\DynamicContentService;
 use PN\LocaleBundle\Entity\Language;
 use PN\LocaleBundle\Translator;
+use PN\MediaBundle\Entity\Image;
 use PN\MediaBundle\Service\UploadDocumentService;
 use PN\MediaBundle\Service\UploadImageService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Form;
-use PN\ContentBundle\Entity\DynamicContent;
-use PN\ContentBundle\Form\DynamicContentType;
-use PN\ContentBundle\Entity\DynamicContentAttribute;
-use PN\ContentBundle\Entity\Translation\DynamicContentAttributeTranslation;
-use PN\ContentBundle\Form\DynamicContentAttributeType;
-use PN\ContentBundle\Form\DynamicContentAttributeBundleType;
-use PN\MediaBundle\Entity\Image;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Dynamiccontent controller.
@@ -33,7 +34,7 @@ class DynamicContentController extends AbstractController
      *
      * @Route("/", name="dynamic_content_index", methods={"GET"})
      */
-    public function indexAction(Request $request, EntityManagerInterface $em)
+    public function index(Request $request, EntityManagerInterface $em):Response
     {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
 
@@ -49,7 +50,7 @@ class DynamicContentController extends AbstractController
      *
      * @Route("/new", name="dynamic_content_new", methods={"GET", "POST"})
      */
-    public function newAction(Request $request, EntityManagerInterface $em)
+    public function new(Request $request, EntityManagerInterface $em):Response
     {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $dynamicContent = new DynamicContent();
@@ -74,7 +75,7 @@ class DynamicContentController extends AbstractController
      *
      * @Route("/{id}/edit", name="dynamic_content_edit", methods={"GET", "POST"})
      */
-    public function editAction(Request $request, DynamicContent $dynamicContent, EntityManagerInterface $em)
+    public function edit(Request $request, DynamicContent $dynamicContent, EntityManagerInterface $em):Response
     {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $editForm = $this->createForm(DynamicContentType::class, $dynamicContent, [
@@ -116,7 +117,7 @@ class DynamicContentController extends AbstractController
      *
      * @Route("/{id}/edit-attribute", name="dynamic_content_attribute_edit", methods={"GET", "POST"})
      */
-    public function editAttributeAction(
+    public function editAttribute(
         Request                 $request,
         DynamicContentAttribute $dynamicContentAttribute,
         EntityManagerInterface  $em,
@@ -124,7 +125,7 @@ class DynamicContentController extends AbstractController
         UploadImageService      $uploadImageService,
         DynamicContentService   $dynamicContentService,
         Translator              $translationService
-    )
+    ):Response
     {
         $this->denyAccessUnlessGranted("ROLE_ADMIN");
         $editForm = $this->createForm(DynamicContentAttributeBundleType::class, [$dynamicContentAttribute]);
@@ -152,7 +153,7 @@ class DynamicContentController extends AbstractController
      *
      * @Route("/{id}/data/edit", name="dynamic_content_attribute_data_edit", methods={"GET", "POST"})
      */
-    public function editAttributeDataAction(
+    public function editAttributeData(
         Request                $request,
         DynamicContent         $dynamicContent,
         EntityManagerInterface $em,
@@ -160,7 +161,7 @@ class DynamicContentController extends AbstractController
         UploadImageService     $uploadImageService,
         DynamicContentService  $dynamicContentService,
         Translator             $translationService
-    )
+    ):Response
     {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $editForm = $this->createForm(DynamicContentType::class, $dynamicContent, [
@@ -204,7 +205,7 @@ class DynamicContentController extends AbstractController
         DynamicContentAttribute $dynamicContentAttribute,
         Request                 $request,
         Form                    $form,
-                                $languages,
+        array                   $languages,
         UploadDocumentService   $uploadDocumentService,
         UploadImageService      $uploadImageService,
         Translator              $translationService,
@@ -289,11 +290,23 @@ class DynamicContentController extends AbstractController
      *
      * @Route("/{id}", name="dynamic_content_delete", methods={"DELETE"})
      */
-    public function deleteAction(Request $request, DynamicContent $dynamicContent, EntityManagerInterface $em)
+    public function delete(Request $request, DynamicContent $dynamicContent, EntityManagerInterface $em):Response
     {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $em->remove($dynamicContent);
         $em->flush();
+
+        return $this->redirectToRoute('dynamic_content_index');
+    }
+    /**
+     * Deletes a dynamicContent entity.
+     *
+     * @Route("/remove-all-cache", name="dynamic_content_delete_all_cache", methods={"GET"})
+     */
+    public function deleteAllCache(Request $request, DynamicContentService $dynamicContentService):Response
+    {
+        $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
+        $dynamicContentService->removeAllDynamicContentCache();
 
         return $this->redirectToRoute('dynamic_content_index');
     }
@@ -303,7 +316,7 @@ class DynamicContentController extends AbstractController
      *
      * @Route("/new-attribute/{id}", name="dynamic_content_attribute_new", methods={"POST"})
      */
-    public function newAttributeAction(Request $request, DynamicContent $dynamicContent, EntityManagerInterface $em)
+    public function newAttribute(Request $request, DynamicContent $dynamicContent, EntityManagerInterface $em):Response
     {
         $this->denyAccessUnlessGranted("ROLE_SUPER_ADMIN");
         $editForm = $this->createForm(DynamicContentType::class, $dynamicContent, [
@@ -348,7 +361,7 @@ class DynamicContentController extends AbstractController
      *
      * @Route("/data/table", defaults={"_format": "json"}, name="dynamic_content_datatable", methods={"GET"})
      */
-    public function dataTableAction(Request $request, EntityManagerInterface $em)
+    public function dataTable(Request $request, EntityManagerInterface $em):Response
     {
         $srch = $request->query->all("search");
         $start = $request->query->getInt("start");
