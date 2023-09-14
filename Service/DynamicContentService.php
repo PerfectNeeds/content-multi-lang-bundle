@@ -9,6 +9,7 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -16,6 +17,8 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 class DynamicContentService
 {
+    private string $environment;
+
     private EntityManagerInterface $em;
     private Packages $assetsManager;
     private RouterInterface $router;
@@ -24,6 +27,7 @@ class DynamicContentService
     private ?Request $request = null;
 
     public function __construct(
+        KernelInterface            $kernel,
         EntityManagerInterface        $em,
         RouterInterface               $router,
         Packages                      $assetsManager,
@@ -32,6 +36,7 @@ class DynamicContentService
         RequestStack                  $requestStack
     )
     {
+        $this->environment = $kernel->getEnvironment();
         $this->em = $em;
         $this->assetsManager = $assetsManager;
         $this->router = $router;
@@ -88,7 +93,9 @@ class DynamicContentService
         $cacheKey = $this->getCacheName($dynamicContentAttributeId);
         $locale = $this->request instanceof Request ? $this->request->getLocale() : "none";
 
-
+        if ($this->environment == "dev") {
+            $this->removeDynamicContentValueFromCache($dynamicContentAttributeId);
+        }
         $data = $cache->get($cacheKey, function (ItemInterface $item) use ($dynamicContentAttributeId, $locale) {
             $item->expiresAfter(2592000); // expire after 30 days
             $dynamicContentAttributeValue = $this->getDynamicContentValue($dynamicContentAttributeId);
