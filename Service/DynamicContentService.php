@@ -4,6 +4,7 @@ namespace PN\ContentBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PN\ContentBundle\Entity\DynamicContentAttribute;
+use PN\ServiceBundle\Service\ContainerParameterService;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -24,16 +25,18 @@ class DynamicContentService
     private RouterInterface $router;
     private TokenStorageInterface $tokenStorage;
     private AuthorizationCheckerInterface $authorizationChecker;
+    private ContainerParameterService $containerParameterService;
     private ?Request $request = null;
 
     public function __construct(
-        KernelInterface            $kernel,
+        KernelInterface               $kernel,
         EntityManagerInterface        $em,
         RouterInterface               $router,
         Packages                      $assetsManager,
         TokenStorageInterface         $tokenStorage,
         AuthorizationCheckerInterface $authorizationChecker,
-        RequestStack                  $requestStack
+        RequestStack                  $requestStack,
+        ContainerParameterService     $containerParameterService
     )
     {
         $this->environment = $kernel->getEnvironment();
@@ -42,6 +45,7 @@ class DynamicContentService
         $this->router = $router;
         $this->tokenStorage = $tokenStorage;
         $this->authorizationChecker = $authorizationChecker;
+        $this->containerParameterService = $containerParameterService;
         if ($requestStack instanceof RequestStack) {
             $this->request = $requestStack->getCurrentRequest();
         }
@@ -88,7 +92,7 @@ class DynamicContentService
      */
     private function getDynamicContentValueFromCache($dynamicContentAttributeId): array
     {
-        $cache = new FilesystemAdapter();
+        $cache = new FilesystemAdapter(directory: $this->containerParameterService->get("kernel.cache_dir") . "/filesystemAdapter-cache");
 
         $cacheKey = $this->getCacheName($dynamicContentAttributeId);
         $locale = $this->request instanceof Request ? $this->request->getLocale() : "none";
@@ -130,13 +134,13 @@ class DynamicContentService
     {
         $cacheKey = $this->getCacheName($dynamicContentAttributeId);
 
-        $cache = new FilesystemAdapter();
+        $cache = new FilesystemAdapter(directory: $this->containerParameterService->get("kernel.cache_dir") . "/filesystemAdapter-cache");
         $cache->delete($cacheKey);
     }
 
     public function removeAllDynamicContentCache(): void
     {
-        $cache = new FilesystemAdapter();
+        $cache = new FilesystemAdapter(directory: $this->containerParameterService->get("kernel.cache_dir") . "/filesystemAdapter-cache");
         $dynamicContentAttributes = $this->em->getRepository(DynamicContentAttribute::class)->findAll();
         foreach ($dynamicContentAttributes as $dynamicContentAttribute) {
             $cacheKey = $this->getCacheName($dynamicContentAttribute->getId());
