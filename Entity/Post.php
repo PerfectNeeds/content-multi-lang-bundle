@@ -19,7 +19,7 @@ class Post {
 
     /**
      * @ORM\ManyToMany(targetEntity="\PN\MediaBundle\Entity\Image", inversedBy="posts", cascade={"persist", "remove" })
-     * @ORM\OrderBy({"tarteb" = "ASC"})
+     * @ORM\OrderBy({"id" = "ASC", "tarteb" = "ASC"})
      */
     protected $images;
 

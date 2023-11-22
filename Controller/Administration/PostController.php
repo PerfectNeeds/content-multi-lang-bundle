@@ -277,6 +277,21 @@ class PostController extends AbstractController
             return $this->json(['error' => 1, 'message' => 'Please enter image name']);
         }
 
+        $returnData = [];
+        if ($image->getImageType() == $imageType) {
+            $image->setImageType(null);
+            $em->persist($image);
+            $em->flush();
+
+            $returnData [] = $this->renderView('@PNContent/Administration/Post/imageItem.html.twig', [
+                'image' => $image,
+                'post' => $post,
+                'imageSetting' => $imageSetting,
+            ]);
+
+            return $this->json(['error' => 0, 'message' => 'Done', 'returnData' => $returnData]);
+        }
+
         if ($post->getMainImage() != null and $imageType == Image::TYPE_MAIN) {
             $filenameForRemove = $post->getMainImage()->getAbsoluteResizeExtension();
             if (file_exists($filenameForRemove)) {
