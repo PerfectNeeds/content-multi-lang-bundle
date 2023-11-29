@@ -4,6 +4,7 @@ namespace PN\ContentBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PN\ContentBundle\Entity\DynamicContentAttribute;
+use PN\ServiceBundle\Service\ContainerParameterService;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Cache\Simple\FilesystemCache;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,26 +21,30 @@ class DynamicContentService
     private TokenStorageInterface $tokenStorage;
     private AuthorizationCheckerInterface $authorizationChecker;
     private Request $request;
+    private ContainerParameterService $containerParameterService;
 
     public function __construct(
-        EntityManagerInterface $em,
-        RouterInterface $router,
-        Packages $assetsManager,
-        TokenStorageInterface $tokenStorage,
+        EntityManagerInterface        $em,
+        RouterInterface               $router,
+        Packages                      $assetsManager,
+        TokenStorageInterface         $tokenStorage,
         AuthorizationCheckerInterface $authorizationChecker,
-        RequestStack $requestStack
-    ) {
+        RequestStack                  $requestStack,
+        ContainerParameterService     $containerParameterService
+    )
+    {
         $this->em = $em;
         $this->assetsManager = $assetsManager;
         $this->router = $router;
         $this->tokenStorage = $tokenStorage;
         $this->authorizationChecker = $authorizationChecker;
         $this->request = $requestStack->getCurrentRequest();
+        $this->containerParameterService = $containerParameterService;
     }
 
     public function getDynamicContentAttribute($dynamicContentAttributeId, $showEditBtn = true)
     {
-        $dynamicContentValue= $this->getDynamicContentValueFromCache($dynamicContentAttributeId);
+        $dynamicContentValue = $this->getDynamicContentValueFromCache($dynamicContentAttributeId);
 
         $editBtn = "";
         if ($showEditBtn == true and in_array($dynamicContentValue["type"],
@@ -47,7 +52,7 @@ class DynamicContentService
             $editBtn = $this->showEditBtn($dynamicContentAttributeId);
         }
 
-        return $dynamicContentValue["value"].$editBtn;
+        return $dynamicContentValue["value"] . $editBtn;
     }
 
     public function showEditBtn($dynamicContentAttributeId)
@@ -58,7 +63,7 @@ class DynamicContentService
 
         $url = $this->router->generate("dynamic_content_attribute_edit", ['id' => $dynamicContentAttributeId]);
 
-        return ' <a href="'.$url.'" target="popup" onclick="window.open(\''.$url.'\',\'popup\',\'width=600,height=600\'); return false;" title="Edit">Edit</a>';
+        return ' <a href="' . $url . '" target="popup" onclick="window.open(\'' . $url . '\',\'popup\',\'width=600,height=600\'); return false;" title="Edit">Edit</a>';
     }
 
     private function isGranted($attributes)
@@ -72,7 +77,7 @@ class DynamicContentService
 
     private function getDynamicContentValueFromCache($dynamicContentAttributeId)
     {
-        $cache = new FilesystemCache();
+        $cache = $this->getFilesystemCache();
         $cacheKey = $this->getCacheName($dynamicContentAttributeId);
         $locale = $this->request instanceof Request ? $this->request->getLocale() : "none";
 
@@ -87,9 +92,11 @@ class DynamicContentService
             $cache->set($cacheKey, $data, 2592000);// expire after 30 days
         }
         $data = $cache->get($cacheKey);
-
+        if (!is_array($data)) {
+            $data = [];
+        }
         if (!array_key_exists($locale, $data)) {
-            $data = $cache->get($cacheKey);
+//            $data = $cache->get($cacheKey);
             $data[$locale] = $dynamicContentAttributeValue = $this->getDynamicContentValue($dynamicContentAttributeId)["value"];
             $cache->set($cacheKey, $data, 2592000);// expire after 30 days
         }
@@ -104,7 +111,7 @@ class DynamicContentService
     public function removeDynamicContentValueFromCache($dynamicContentAttributeId)
     {
         $cacheKey = $this->getCacheName($dynamicContentAttributeId);
-        $cache = new FilesystemCache();
+        $cache = $this->getFilesystemCache();
         $cache->delete($cacheKey);
     }
 
@@ -125,7 +132,7 @@ class DynamicContentService
 
             return [
                 "type" => $dynamicContentAttribute->getType(),
-                "value" => $this->router->generate("download")."?d=".str_replace('"', "'",
+                "value" => $this->router->generate("download") . "?d=" . str_replace('"', "'",
                         json_encode($params)),
             ];
         } elseif ($dynamicContentAttribute->getType() == DynamicContentAttribute::TYPE_HTML) {
@@ -141,8 +148,13 @@ class DynamicContentService
         ];
     }
 
+    private function getFilesystemCache()
+    {
+        return new FilesystemCache('', 0, $this->containerParameterService->get('kernel.cache_dir') . '/data-cache');
+    }
+
     private function getCacheName($id)
     {
-        return 'dynamic_content_'.$id;
+        return 'dynamic_content_' . $id;
     }
 }
