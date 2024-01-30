@@ -3,9 +3,18 @@
         <div class="mb-10">
             <h4 class="no-margin-top mb-10">{% trans %}Images Dimensions{% endtrans %}:</h4>
             {% for imageSettingType in imageSetting.imageSettingTypes %}
-                <p class="mb-5 ml-5"><strong>{{ imageSettingType.imageType.name|trans }}
+                {{ dump(imageSettingType.validateWidthAndHeight) }}
+                <p class="mb-5 ml-5">
+                    <strong>
+                        {{ imageSettingType.imageType.name|trans }}
+
+                        {% if imageSettingType.validateWidthAndHeight == false %}
+                            (Recommended dimension)
+                        {% else %}
+                            (Should be)
+                        {% endif %}
                         :</strong>
-                        {% if imageSettingType.width == null and imageSettingType.height == null %}
+                    {% if imageSettingType.width == null and imageSettingType.height == null %}
                         --
                     {% elseif imageSettingType.width != null  and imageSettingType.height == null %}
                         {{ imageSettingType.width }}px * --
@@ -17,7 +26,8 @@
                 </p>
             {% endfor %}
             <p class="mb-5 ml-5">
-                <span style="color: red">*</span> Images more than 2MB is not recommended as it will slow down the page speed, performance and so the search engine results ex: Google search
+                <span style="color: red">*</span> Images more than 2MB is not recommended as it will slow down the page
+                speed, performance and so the search engine results ex: Google search
             </p>
         </div>
         <div class="file-loading">
@@ -32,34 +42,35 @@
         <h6 class="panel-title">{{ imageSetting.entityName|trans }} {% trans %}Images{% endtrans %}</h6>
         <div class="heading-elements">
             <div class="heading-btn">
-                <button type="button" class="btn btn-danger delete" disabled="" id="delete">{% trans %}Delete{% endtrans %}</button>
+                <button type="button" class="btn btn-danger delete" disabled=""
+                        id="delete">{% trans %}Delete{% endtrans %}</button>
             </div>
         </div>
     </div>
     <div class="table-responsive">
         <table class="table sorted_table">
             <thead>
-                <tr>
-                    <th><input type="checkbox" id="selectAll"/> </th>
-                    <th>{% trans %}Image{% endtrans %}</th>
-                    <th>{% trans %}Dimensions{% endtrans %}</th>
-                    <th>{% trans %}Size{% endtrans %}</th>
-                    <th>{% trans %}Type{% endtrans %}</th>
-                    <th>{% trans %}Name{% endtrans %}</th>
-                    <th>{% trans %}Alt{% endtrans %}</th>
-                    <th>{% trans %}Action{% endtrans %}</th>
-                </tr>
+            <tr>
+                <th><input type="checkbox" id="selectAll"/></th>
+                <th>{% trans %}Image{% endtrans %}</th>
+                <th>{% trans %}Dimensions{% endtrans %}</th>
+                <th>{% trans %}Size{% endtrans %}</th>
+                <th>{% trans %}Type{% endtrans %}</th>
+                <th>{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}Alt{% endtrans %}</th>
+                <th>{% trans %}Action{% endtrans %}</th>
+            </tr>
 
             </thead>
             <tbody id="image-list">
 
-                {% for image in entity.images %}
-                    {% set radioButtonArray = [] %}
-                    {% for radioButton in imageSetting.notRadioButton %}
-                        {% set radioButtonArray = radioButtonArray|merge([radioButton.imageType.id]) %}
-                    {% endfor %}
-                    {% include '@PNContent/Administration/Post/imageItem.html.twig' with {'image':image} %}
+            {% for image in entity.images %}
+                {% set radioButtonArray = [] %}
+                {% for radioButton in imageSetting.notRadioButton %}
+                    {% set radioButtonArray = radioButtonArray|merge([radioButton.imageType.id]) %}
                 {% endfor %}
+                {% include '@PNContent/Administration/Post/imageItem.html.twig' with {'image':image} %}
+            {% endfor %}
             </tbody>
         </table>
     </div>
