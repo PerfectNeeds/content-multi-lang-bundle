@@ -3,7 +3,6 @@
         <div class="mb-10">
             <h4 class="no-margin-top mb-10">{% trans %}Images Dimensions{% endtrans %}:</h4>
             {% for imageSettingType in imageSetting.imageSettingTypes %}
-                {{ dump(imageSettingType.validateWidthAndHeight) }}
                 <p class="mb-5 ml-5">
                     <strong>
                         {{ imageSettingType.imageType.name|trans }}
